@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Registrar Usuario</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/registration.css}" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"/>
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  	<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  	<link rel="stylesheet" type="text/css" th:href="@{/css/sweetalert.css}" />
+</head>	
+<style th:inline="text">
+     fieldset 
+	{
+		border: 1px solid #ddd !important;
+		margin: 0;
+		xmin-width: 0;
+		padding: 10px;       
+		position: relative;
+		border-radius:4px;
+		background-color:#BDBDBD;
+		padding-left:10px!important;
+	}	
+	
+	legend
+	{
+		font-size:20px;
+		font-weight:bold;
+		margin-bottom: 0px; 
+		width: 30%; 
+		border: 1px solid #ddd;
+		border-radius: 4px; 
+		padding: 5px 5px 5px 10px; 
+		background-color: #ffffff;
+	}
+	
+	@media (max-width: 700px) {
+    label,
+    input {
+        display: inline-block;
+    }
+	
+</style>
+<body>
+	<div class="container">
+		<form autocomplete="off" action="#" th:action="@{/registrar}" th:object="${usuario}" method="post" class="form-horizontal" role="form">
+			<h2> Registrar usuarios</h2>
+			<fieldset class="form-inline"> 
+				<legend>Usuario</legend>
+<!-- *********************** INPUT CON ERROR *********************** -->
+				<span th:if="${#fields.hasErrors('nombre')}">
+					<label><span style="font-size: 20; color: #FF1C19;">Nombre completo* </span></label>
+					<input style="border-color : #FF1C19;" type="text" size="50px" maxlength="100" th:field="*{nombre}" placeholder="Nombre completo" class="form-control"/>
+				</span>
+<!-- *********************** INPUT SIN ERROR *********************** -->
+				<span th:if="!${#fields.hasErrors('nombre')}">
+					<label for="name">Nombre completo: </label>
+					<input type="text" size="50px" maxlength="100" th:field="*{nombre}" placeholder="Nombre completo" class="form-control"/>
+				</span><br/><br/>
+<!-- *********************** INPUT CON ERROR *********************** -->
+				<span th:if="${#fields.hasErrors('matricula')}">
+					<label><span style="font-size: 20; color: #FF1C19;">Matricula* </span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input style="border-color : #FF1C19;" type="number" size="7" maxlength="7" th:field="*{matricula}" placeholder="Matricula" class="form-control"/>
+				</span>
+<!-- *********************** INPUT SIN ERROR *********************** -->
+				<span th:if="!${#fields.hasErrors('matricula')}">
+					<label>Matricula: </label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="text" size="30px" maxlength="7" th:field="*{matricula}" placeholder="Matricula" class="form-control"/>
+				</span><br/><br/>
+<!-- *********************** INPUT CON ERROR *********************** -->
+				<span th:if="${#fields.hasErrors('password')}">
+					<label><span style="font-size: 20; color: #FF1C19;">Password*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input style="border-color : #FF1C19;" type="password" maxlength="25" th:field="*{password}" placeholder="Password" class="form-control"/>
+				</span>
+<!-- *********************** INPUT SIN ERROR *********************** -->
+				<span th:if="!${#fields.hasErrors('password')}">
+				<label>Password: </label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="password" maxlength="25" th:field="*{password}" placeholder="Password" class="form-control"/>
+				</span>
+			</fieldset><br/>
+			<div class="form-group">
+				<div class="col-sm-2">
+					<button type="submit" class="btn btn-primary btn-block">Guardar</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+		<span th:if="${matriculaexiste}== 1">
+		<script th:inline="javascript">
+		swal("The User Already Exists!!", {
+			  icon: "warning",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>
+		<span th:if="${error}== Si">
+		<script th:inline="javascript">
+		swal("Check the fields Properly!!", {
+			  icon: "warning",
+			  text: "Remember Matricula should be 7 digits!",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>
+		<span th:if="${error}== firstlettercantbe0">
+		<script th:inline="javascript">
+		swal("Check the fields Properly!!", {
+			  icon: "warning",
+			  text: "The first digit can't be '0'! ",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>
+
+</body>
+</html>
