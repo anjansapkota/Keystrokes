@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+	<title>E65</title>
+		<link rel="stylesheet" type="text/css" th:href="@{css/loginStyle.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap-theme.min.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/sweetalert.css}" />
+		<script src="js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"/>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</head>
+<body>
+<div th:fragment="menu">
+		<nav class="navbar navbar-inverse">
+	        <div class="container-fluid">
+			    <!-- Brand and toggle get grouped for better mobile display -->
+			    <div class="navbar-header">
+			    	<a class="navbar-brand" href="/kyd/">DPI</a>
+					<a class="navbar-brand text-white" href="/kyd/"><strong>HOME</strong></a>
+					 
+			    </div>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				    <ul class="nav navbar-nav navbar-right" style="font-size: 20px;">
+					    <li class="dropdown">
+						    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><strong style="font-size: 20px;" th:text="${user}">a</strong> <span class="caret"></span></a>
+						    <ul class="dropdown-menu">
+						    	<li><a href="/kyd/changePassword">Change Password</a></li>
+							    <li><a href="/kyd/logout">Logout</a></li>
+							    <li role="separator" class="divider"></li>
+							    <li><a href="#"></a></li>
+						    </ul>
+					    </li>
+				    </ul>
+			    </div><!-- /.navbar-collapse -->
+		    </div><!-- /.container-fluid -->
+	    </nav>
+	    </div>
+
+	    
+	<div class="container">
+	    <div class="col-12 mt-5" style = "">
+			<div style="margin-top: 20%; text-align: center;">
+				<h1 style="color: Black; font-size: 60px;" >Write a little bit about how you feel today.</h1>
+				<form th:action="@{/#}" method="POST">
+					<div class="form-group">
+   						 <textarea class="form-control" id="answerSpace" rows="20"></textarea>
+  					</div>					
+					<a class="btn btn-lg btn-success btn-block shake" style=" width:400px;" href="/kyd/#">Submit! </a>
+				</form>
+			</div>
+		</div>
+	</div>
+	</body>
+</html>

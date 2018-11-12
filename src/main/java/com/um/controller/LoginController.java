@@ -40,7 +40,7 @@ public class LoginController {
 		Usuario usuario = usuarioService.buscaUsuarioPorMatricula(auth.getName());
 		modelAndView.addObject("user", usuario.getNombre());
 		modelAndView.addObject("adminMessage","Content Available Only for Users with Admin Role");
-		modelAndView.setViewName("ftphome");
+		modelAndView.setViewName("home");
 		return modelAndView;
 	}
 	
