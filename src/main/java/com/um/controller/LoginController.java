@@ -27,10 +27,10 @@ public class LoginController {
 	
 	
 	@RequestMapping(value={"/logout"}, method = RequestMethod.GET)
-	public ModelAndView logout(){
+	public void  logout(){
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("login");
-		return modelAndView;
+		return ;
 	}
 	
 	@RequestMapping(value="/inicio", method = RequestMethod.GET)
@@ -44,16 +44,27 @@ public class LoginController {
 		return modelAndView;
 	}
 	
-	
-	@RequestMapping(value="/SdpmSt204snirkdT/5S4dkas2dkasdSD/{password}/aFrt6nalResaW3qw", method = RequestMethod.GET)
-	public ModelAndView changePass(@PathVariable String password){
-		ModelAndView modelAndView = new ModelAndView();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Usuario usuario = usuarioService.buscaUsuarioPorMatricula(auth.getName());
-		usuario.setPassword(password);
-		int a = usuarioService.changePassword(usuario);
-		modelAndView.setViewName("login");
-		modelAndView.addObject("passwordChanged", a);
-		return modelAndView;
-	}
+//	@RequestMapping(value={"/changePassword"}, method = RequestMethod.GET)
+//	public ModelAndView changePasswordRequest(){
+//		ModelAndView modelAndView = new ModelAndView();
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		Usuario usuario = usuarioService.buscaUsuarioPorMatricula(auth.getName());
+//		modelAndView.addObject("user", usuario.getNombre());
+//		modelAndView.addObject("requestingPasswordChange", "Si");
+//		modelAndView.setViewName("home");
+//		return modelAndView;
+//	}
+//	
+//	
+//	@RequestMapping(value= {"/SdpmSt204snirkdT/5S4dkas2dkasdSD/{password}/aFrt6nalResaW3qw"}, method = RequestMethod.GET)
+//	public  ModelAndView changePass(@PathVariable String password){
+//		ModelAndView modelAndView = new ModelAndView();
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		Usuario usuario = usuarioService.buscaUsuarioPorMatricula(auth.getName());
+//		usuario.setPassword(password);
+//		int a = usuarioService.changePassword(usuario);
+//		modelAndView.addObject("passwordChanged", a);
+//		modelAndView.setViewName("login");
+//		return modelAndView;
+//	}
 }
