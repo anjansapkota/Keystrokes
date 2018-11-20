@@ -10,6 +10,8 @@ var A;
 var B;
 var C;
 var D;
+var count = 0;
+var list = new Array();
 function keydown(e) {
 	var n = window.performance.now();
 	B = n - X;     //press_press    p2-p1
@@ -18,7 +20,7 @@ function keydown(e) {
 }
 
 function keypress(e) {
-	console.log(window.performance.now());
+	//console.log(window.performance.now());
 }
 
 function keyup(e) {
@@ -26,5 +28,16 @@ function keyup(e) {
 	A = m - X;      //press_release r1-p1
 	D = m - Y;      // R2-R1
 	Y = m;
-	console.log(A + "   " + B + "   " + C +  "   " + D + "   " )
+	if(count>0){
+		var nameOfList = new Array();
+		nameOfList.push(A);
+		nameOfList.push(B);
+		nameOfList.push(C);
+		nameOfList.push(D);
+		list.push(nameOfList)
+	}
+	count++;
+	for (var i = 0; i < list .length; i ++ ){
+        window.console.log(list[i]);
+     }
 }
