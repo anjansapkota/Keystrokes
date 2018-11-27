@@ -18,7 +18,7 @@ public class KeysController {
 
 	List<Key> keys = new ArrayList<>();
 
-	@PostMapping("/refreshA")
+	@GetMapping("/refresh/{keys}")
 	public ResponseEntity<Object> addBook(@RequestBody List<Key> keyscombinations) {
 		//method to validate typing
 		//String status = "ok";

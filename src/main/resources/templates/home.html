@@ -50,11 +50,11 @@
 	    <div class="col-12 mt-5" style = "">
 			<div style="margin-top: 20%; text-align: center;">
 				<h1 style="color: Black; font-size: 60px;" >Write a little bit about how you feel today.</h1>
-				<form th:action="@{/#}" method="POST">
+				<form id="answerform" th:action="@{/#}" method="POST">
 					<div class="form-group">
-   						 <textarea class="form-control" id="answerSpace" rows="20"></textarea>
+   						 <textarea id="textinput" class="form-control" rows="20"></textarea>
   					</div>					
-					<a class="btn btn-lg btn-success btn-block shake" style=" width:400px;" href="/kyd/#">Submit! </a>
+					<a id="btn-submit" class="btn btn-lg btn-success btn-block shake" style=" width:400px;" href="/kyd/#">Submit! </a>
 				</form>
 			</div>
 		</div>
