@@ -11,7 +11,10 @@ import lombok.ToString;
 @ToString
 public class ServiceResponse<T> {
 	
+	public ServiceResponse(String string, int i) {
+		// TODO Auto-generated constructor stub
+	}
 	private String status;
-	private T data;
+	private int data;
 
 }

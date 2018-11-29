@@ -23,51 +23,37 @@ function keydown(e) {
 	KM=KN;
 	if(e.ctrlKey){
 		KN = "ctrl";
-		console.log(e.keyCode);
 	}else if(e.altKey){
 		KN = "alt";
-		console.log(e.keyCode);
 	}else if(e.shiftKey){
 		KN = "shift";
-		console.log(e.keyCode);
 	}else if(e.keyCode==8){
 		KN = "backspace";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==46){
 		KN = "del";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==32){
 		KN = "space";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==20){
 		KN = "capslock";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==37){
 		KN = "leftarrow";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==39){
 		KN = "rightarrow";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==38){
 		KN = "uparrow";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==40){
 		KN = "downarrow";
-		console.log(e.keyCode);
 	}
 	else if(e.keyCode==13){
 		KN = "enter";
-		console.log(e.keyCode);
 	}
-	
-	console.log(e.keyCode);
 }
 
 function kp(e) {
@@ -93,67 +79,34 @@ function keyup(e) {
 	}
 	count++;
 	if(count%10==9){
+		ajaxFire(list);
 		for (var i = 0; i < list .length; i ++ ){
-	        window.console.log(list[i]);
+	        var lastElem = new Array();
+	        lastElem=list.pop();
+	        list.length = 0;
+	        list.push(lastElem);
 	     }
-		strike(list)
 	}
 	
 }
 
-
-
-function strike(list) {
-	  var xhttp = new XMLHttpRequest();
-	  xhttp.onreadystatechange = function() {
-	    if (this.readyState == 4 && this.status == 200) {
-	      if (this.responseText==1){
-	    	  
-	      }
-	    }
-	  };
-	  xhttp.open("GET", "/refresh" + list , true);
-	  xhttp.send();
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-$(document).ready(function () {
-
-    function fire(list){
-    	fire_ajax_submit(list);
-    }
-});
-
-function fire_ajax_submit(info) {
-    $.ajax({
-        type: "POST",
-        contentType: {info:info},
-        url: "/refresh",
-        cache: false,
-        timeout: 600000,
-        success: function (data) {
-        	if(data==0){
-        	}else{
-        		swal("Your exam will be blocked within a minute!!!!!", {
-      			  icon: "warning",
-      			  buttons:false,
-      			  timer:2000,
-      		});
-        	}
-          },
-        error: function (e) {
-            console.log("ERROR : ", e);
-        }
-    });
-
+function ajaxFire(list) {
+				// DO POST
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : "refresh",
+					data : JSON.stringify(list),
+					dataType : 'json',
+					success : function(result) {
+						if (result.status == "success") {
+						console.log("success");
+						}
+						console.log(result);
+					},
+					error : function(e) {
+						alert("Error!")
+						console.log("ERROR: ", e);
+					}
+				})
 }
