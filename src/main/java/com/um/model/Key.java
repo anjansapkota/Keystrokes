@@ -7,7 +7,7 @@ private String letter2;
 private long press1_release1;	//the time interval between a key press and the key release.
 private long press1_press2;		//the time interval between a key press and the next key press.
 private long release1_press2;	//the time interval between a key release and the next key press. (-)
-private long release_release;	//the time interval between a key release and the next key release.
+private long release1_release2;	//the time interval between a key release and the next key release.
 
 public String getLetter1() {
 	return letter1;
@@ -39,10 +39,10 @@ public long getRelease1_press2() {
 public void setRelease1_press2(long release1_press2) {
 	this.release1_press2 = release1_press2;
 }
-public long getRelease_release() {
-	return release_release;
+public long getRelease1_release2() {
+	return release1_release2;
 }
-public void setRelease_release(long release_release) {
-	this.release_release = release_release;
+public void setRelease1_release2(long release_release) {
+	this.release1_release2 = release_release;
 }
 }
