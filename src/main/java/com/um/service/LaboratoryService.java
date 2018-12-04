@@ -11,5 +11,5 @@ public interface LaboratoryService {
 
 	void printVector(Vector<Key> printingList, String name);
 
-	void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2);
+	void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 }
