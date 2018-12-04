@@ -1,9 +1,15 @@
 package com.um.service;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.util.Vector;
 
-import com.um.model.Role;
-import com.um.model.Usuario;
+import com.um.model.Key;
 
 public interface LaboratoryService {
+
+	Vector<Object> bringAllData() throws SQLException;
+
+	void printVector(Vector<Key> printingList, String name);
+
+	void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2);
 }

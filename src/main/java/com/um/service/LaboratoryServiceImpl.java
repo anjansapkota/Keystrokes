@@ -11,8 +11,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
 	private KMS kms;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
-	@Autowired
-	public void test() throws SQLException {
+	@Override
+	public Vector <Object> bringAllData() throws SQLException {
+		Vector <Object> AllData = new Vector <Object>();
 		Vector <Usuario> personas = kms.bringlistofPersons();
 		Vector<String> userNames =  new Vector<String>();
 		for (int i = 0; i < personas.size(); i++) {
@@ -26,8 +27,13 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			printVector(registrosTemp,personas.get(i).getNombre());
 			userNames.add(personas.get(i).getNombre());
 		}
+		AllData.add(keys4mdbEvry1);
+		AllData.add(userNames);
+		return AllData ;	//All data is an array of objects, where the first object is the array of list of keycombinations of all the users from the database and the second is
+							//the usernames of all the users.
 	}
 	
+	@Override
     public void printVector(Vector<Key> printingList, String name){
     	System.out.println();
     	System.out.println("The vector " + name + " is printing below."); 
@@ -38,7 +44,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	System.out.println("The vector " + name + " finished printing");
     	System.out.println();
     }
-    
+	@Override
     public void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2 ) {   	
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];
