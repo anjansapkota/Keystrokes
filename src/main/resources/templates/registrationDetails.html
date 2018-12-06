@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+	<title>E65</title>
+		<link rel="stylesheet" type="text/css" th:href="@{css/loginStyle.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap-theme.min.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/sweetalert.css}" />
+		<script th:src="@{js/sweetalert.js}" ></script>
+		<script th:src="@{js/js/refresh.js}" ></script>
+		<script th:src="@{js/jquery.js}" ></script>
+		<script src="js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"/>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</head>
+<body>
+	<div class="container">
+	    <div class="col-12 mt-5" style = "">
+			<div style="margin-top: 20%; text-align: center;">
+				<form id="answerform" th:action="@{/reg_complete}" method="POST">
+				<h1 style="color: Black; font-size: 60px;" >Why did you choose this career, how is your world view, explain in about 300 words?</h1>
+					<div class="form-group">
+   						 <textarea id="textinput" class="form-control" rows="20"></textarea>
+  					</div><br></br>
+  					
+  				<h1 style="color: Black; font-size: 60px;" >Write an essay about yourself in about 500 words?</h1>
+					<div class="form-group">
+   						 <textarea id="textinput" class="form-control" rows="20"></textarea>
+  					</div><br></br>	
+  										
+					<a id="btn-submit" class="btn btn-lg btn-success btn-block shake" style=" width:400px;" href="/kyd/#">Submit! </a>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+
+	
+	</body>
+</html>

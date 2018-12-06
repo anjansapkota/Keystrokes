@@ -49,7 +49,7 @@ public class RegitrarController {
 			usuarioService.guardarUsuario(usuario);
 			modelAndView.addObject("error", error);
 			modelAndView.addObject("userRegistertionProblem", "no");
-			modelAndView.setViewName("login");
+			modelAndView.setViewName("registrationDetails");
 		}else {
 			modelAndView.addObject("error", error);
 			modelAndView.addObject("usuario", new Usuario());

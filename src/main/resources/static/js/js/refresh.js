@@ -65,17 +65,19 @@ function kp(e) {
 function keyup(e) {
 	var m = window.performance.now();
 	A = m - X;      //press_release r1-p1
-	D = m - Y;      // R2-R1
+	D = m - Y;      // R1-R2
 	Y = m;
 	if(count>0){
-		var nameOfList = new Array();
-		nameOfList.push(KM);
-		nameOfList.push(KN);
-		nameOfList.push(A);
-		nameOfList.push(B);
-		nameOfList.push(C);
-		nameOfList.push(D);
-		list.push(nameOfList)
+		myObj = { "l1":KM, "l2":KN, "p1r1":Math.round(A*100), "p1p2":Math.round(B*100), "r1p2":Math.round(C*100), "r1r2":Math.round(D*100)};
+//		
+//		var nameOfList = new Array();
+//		nameOfList.push(KM);
+//		nameOfList.push(KN);
+//		nameOfList.push(A);
+//		nameOfList.push(B);
+//		nameOfList.push(C);
+//		nameOfList.push(D);
+		list.push(myObj)
 	}
 	count++;
 	if(count%10==9){
