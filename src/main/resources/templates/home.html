@@ -59,6 +59,16 @@
 				</form>
 			</div>
 		</div>
-	</div>	
+	</div>
+			<span th:if="${regcomplete}== si">
+		<script th:inline="javascript">
+		swal("", {
+			  title: "Registro Completado! Bienvenido!!",
+			  icon: "success",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>	
 	</body>
 </html>

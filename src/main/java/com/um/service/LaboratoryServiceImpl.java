@@ -1,9 +1,11 @@
 package com.um.service;
 import java.sql.SQLException;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.um.model.Corelation;
 import com.um.model.Key;
@@ -14,9 +16,10 @@ import com.um.model.Usuario;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.inference.TTest;
 
+@Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
-	private KMS kms;
+	private KmService kmService;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
     private static long P1R1  = 1000000;
     private static long P1P2  = 1000000;
@@ -27,10 +30,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Override
 	public Vector <Object> bringAllData() throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
-		Vector <Usuario> personas = kms.bringlistofPersons();
+		Vector <Usuario> personas = kmService.bringlistofPersons();
 		Vector<String> userNames =  new Vector<String>();
 		for (int i = 0; i < personas.size(); i++) {
-			Vector <Key> registrosTemp = kms.retrieveKeysFromDB(personas.get(i).getMatricula());
+			Vector <Key> registrosTemp = kmService.retrieveKeysFromDB(personas.get(i).getMatricula());
 			for(int jj=0; jj<registrosTemp.size(); jj++) {
 				if(registrosTemp.get(jj).getRelease1_press2() >= 2000000000) {
 					registrosTemp.remove(jj);
@@ -104,6 +107,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		System.out.println("T-Test Results : " + "P1R1: " + pValuePress1_release1 + " y " + "P1P2: " + pValuePress1_press2 + "R1P2: " + pValueRelease1_press2 + "R1R2: " + pValueRelease1_release2 );
     }
 	
+	@Override
 	public void checkMatches(Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
@@ -148,7 +152,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	correlationtest(teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
     }
 	
-	
+	@Override
 	public void correlationtest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];

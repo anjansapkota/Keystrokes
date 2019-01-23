@@ -1,14 +1,12 @@
 package com.um.service;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Vector;
 
 import com.um.model.Key;
-import com.um.model.Role;
 import com.um.model.Usuario;
 
-public interface KMS {
+public interface KmService {
 	int personexists(String matricula);
 
 	Vector<Key> retrieveKeysFromDB(String matricula) throws SQLException;

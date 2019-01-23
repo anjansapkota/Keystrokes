@@ -21,25 +21,24 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.um.model.Key;
 import com.um.model.Usuario;
-import com.um.service.KMS;
+import com.um.service.KmService;
 import com.um.service.LaboratoryService;
 import com.um.service.UsuarioService;
 
-@Controller
+@RestController
 public class KeysManagementController {
 	
 	@Autowired
-	private UsuarioService usuarioService;
-	@Autowired
-	private KMS kms;
+	private UsuarioService usuarioService;	
 	@Autowired
 	private LaboratoryService lbs;
 	@Autowired
-	private UsuarioService us;
+	private KmService kmService;
 	Vector <Key> listofKeysRecieved = new Vector<>();
 	List<JSONObject> keys = new ArrayList<>();
 	private Authentication auth;	
@@ -72,19 +71,24 @@ public class KeysManagementController {
 	}
 
 	@RequestMapping(value= {"/reg_complete"}, method = RequestMethod.POST)
-	public void regComplete(String textWhyChose, String textEssay) throws SQLException {
+	public ModelAndView regComplete(String textWhyChose, String textEssay) throws SQLException {
+		ModelAndView modelAndView = new ModelAndView();
+		String view = "";
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
-		ModelAndView modelAndView = new ModelAndView();
 		int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
 		System.out.println(aaa);
 		if(aaa==0){
-			kms.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
-			us.RegistrationCompleted(matriculaEnTexto);
-			modelAndView.setViewName("home");
+			kmService.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
+			usuarioService.RegistrationCompleted(matriculaEnTexto);
+			modelAndView.addObject("regcomplete", "si");
+			view = "home";
 		}else {
 			modelAndView.addObject("copied", "si");
-			modelAndView.setViewName("registrationDetails");
+			view = "registrationDetails";
 		}
+		listofKeysRecieved = null;
+		modelAndView.setViewName(view);
+		return modelAndView;
 	}
 }

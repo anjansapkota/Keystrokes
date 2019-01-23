@@ -14,4 +14,8 @@ public interface LaboratoryService {
 	void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 
 	int checkIfCopyPasted(Vector<Key> listofKeysRecieved);
+
+	void checkMatches(Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name);
+
+	void correlationtest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 }

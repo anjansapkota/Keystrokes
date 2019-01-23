@@ -8,19 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.stereotype.Service;
 
 import com.um.model.Key;
 import com.um.model.Usuario;
-
-public class KMSImpl implements KMS {
+@Service("kmService")
+public class KMImpl implements KmService {
 	@Autowired
 	@Qualifier("postgresJdbcTemplate")
 	private JdbcTemplate postgresTemplate;
-
+	@Override
 	public int personexists(String matricula){
 		int personID = 0;
 		Vector <Usuario> personas =  new Vector();
-		String query = "SELECT * FROM USUARIOS";
+		String query = "SELECT * FROM USUARIO";
 		postgresTemplate.query(query, new RowCallbackHandler()	{
 			public void processRow(ResultSet rs) throws SQLException {		
 				while (rs.next()) {
@@ -60,7 +61,7 @@ public class KMSImpl implements KMS {
 	@Override
 	public Vector <Usuario> bringlistofPersons(){
 		Vector <Usuario> personas =  new Vector();
-		String query = "SELECT * FROM USUARIOS";
+		String query = "SELECT * FROM USUARIO";
 		postgresTemplate.query(query, new RowCallbackHandler()	{
 			public void processRow(ResultSet rs) throws SQLException {		
 				while (rs.next()) {

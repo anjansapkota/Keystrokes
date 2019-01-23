@@ -92,16 +92,17 @@
 	
 		<span th:if="${matriculaexiste}== 1">
 		<script th:inline="javascript">
-		swal("The User Already Exists!!", {
+		swal("Este Usuario Ya existe!!", {
 			  icon: "warning",
 			  buttons:false,
 			  timer:2000,
 		});	
 		</script>
 		</span>
+
 		<span th:if="${error}== Si">
 		<script th:inline="javascript">
-		swal("Check the fields Properly!!", {
+		swal("Verifique los campos!!", {
 			  icon: "warning",
 			  text: "Matricula tiene que ser de 7 digitos!",
 			  buttons:false,
@@ -111,7 +112,7 @@
 		</span>
 		<span th:if="${error}== firstlettercantbe0">
 		<script th:inline="javascript">
-		swal("Check the fields Properly!!", {
+		swal("Verifique los campos!!", {
 			  icon: "warning",
 			  text: "La matricula no puede iniciarse con 0! ",
 			  buttons:false,

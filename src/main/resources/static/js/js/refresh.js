@@ -101,13 +101,8 @@ function ajaxFire(list) {
 					data : JSON.stringify(list),
 					dataType : 'json',
 					success : function(result) {
-						if (result.status == "success") {
-						console.log("success");
-						}
-						console.log(result);
 					},
 					error : function(e) {
-						alert("Error!")
 						console.log("ERROR: ", e);
 					}
 				})
