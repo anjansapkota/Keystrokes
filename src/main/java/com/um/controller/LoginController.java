@@ -40,7 +40,14 @@ public class LoginController {
 		Usuario usuario = usuarioService.buscaUsuarioPorMatricula(auth.getName());
 		modelAndView.addObject("user", usuario.getNombre());
 		modelAndView.addObject("adminMessage","Content Available Only for Users with Admin Role");
-		modelAndView.setViewName("home");
+		if(usuarioService.checkRegistrationStatus(usuario)==1) {			
+			modelAndView.setViewName("home");
+		}
+		else {
+			modelAndView.addObject("reg_estado", "incompleto");
+			modelAndView.setViewName("registrationDetails");
+		}
+		
 		return modelAndView;
 	}
 	

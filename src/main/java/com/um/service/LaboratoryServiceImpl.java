@@ -190,4 +190,19 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			ResultTable.get(Name).setCorrelationTestResult(correlationTestResult);
     	}
     }
+	@Override
+	public int checkIfCopyPasted(Vector <Key> listofKeysRecieved) {
+		int a=0;
+		for (int i = 0; i < listofKeysRecieved.size(); i++) {
+			if(listofKeysRecieved.get(i).getLetter1()=="ctrl") {
+				if(listofKeysRecieved.get(i).getLetter2()=="v" || listofKeysRecieved.get(i).getLetter2()=="V") {
+					a = 1;
+				}
+			}
+		}
+		return a;
+	}
+	
+	
+	
 }

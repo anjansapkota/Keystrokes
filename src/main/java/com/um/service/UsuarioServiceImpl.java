@@ -178,5 +178,35 @@ public class UsuarioServiceImpl implements UsuarioService {
 		int a = postgresTemplate.update(query, parametros);
 		return a;
 	}
+	
+	@Override
+	public int checkRegistrationStatus(Usuario usuario) {
+		int a = 0;
+		String query = "SELECT registration_completed FROM usuario WHERE matricula = ?";
+			Object[] parametros = new Object[] {
+					usuario.getMatricula()
+			};
+			postgresTemplate.query(query, parametros, new RowCallbackHandler()	{
+				public void processRow(ResultSet rs) throws SQLException {
+					usuario.setReg_estado(rs.getInt("registration_completed"));
+			   }
+			});
+			if(usuario.getReg_estado() == 1001) {
+				a=1;
+			}	
+		return a;
+	}
+	
+	@Override
+	public int RegistrationCompleted(String matricula) {
+		int stat= 1001;
+		int a = 0;
+		String query = "UPDATE USUARIO SET registration_completed = ? WHERE matricula = ? ";
+			Object[] parametros = new Object[] {
+					stat, matricula
+			};
+			a = postgresTemplate.update(query, parametros);
+		return a;
+	}
 
 }

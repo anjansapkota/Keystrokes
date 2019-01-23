@@ -12,7 +12,14 @@ public class Usuario {
 	@Size(min=4, max=50, message="Debe tener mas de 4 caracteres")
 	private String password;
 	private int activo;
+	private int reg_estado;
 	
+	public int getReg_estado() {
+		return reg_estado;
+	}
+	public void setReg_estado(int reg_estado) {
+		this.reg_estado = reg_estado;
+	}
 	public int getId() {
 		return id;
 	}

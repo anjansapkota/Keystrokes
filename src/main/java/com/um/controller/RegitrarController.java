@@ -59,5 +59,4 @@ public class RegitrarController {
 		
 		return modelAndView;
 	}
-	
 }

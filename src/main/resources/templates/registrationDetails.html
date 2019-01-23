@@ -21,28 +21,43 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</head>
-<body>
+<body oncopy="return false" oncut="return false" onpaste="return false">
 	<div class="container">
 	    <div class="col-12 mt-5" style = "">
 			<div style="margin-top: 20%; text-align: center;">
 				<form id="answerform" th:action="@{/reg_complete}" method="POST">
 				<h1 style="color: Black; font-size: 60px;" >Why did you choose this career, how is your world view, explain in about 300 words?</h1>
 					<div class="form-group">
-   						 <textarea id="textinput" class="form-control" rows="20"></textarea>
+   						 <textarea id="textWhyChose" name="textWhyChose" class="form-control" rows="20"></textarea>
   					</div><br></br>
   					
   				<h1 style="color: Black; font-size: 60px;" >Write an essay about yourself in about 500 words?</h1>
 					<div class="form-group">
-   						 <textarea id="textinput" class="form-control" rows="20"></textarea>
+   						 <textarea id="textEssay" name="textEssay" class="form-control" rows="20"></textarea>
   					</div><br></br>	
-  										
-					<a id="btn-submit" class="btn btn-lg btn-success btn-block shake" style=" width:400px;" href="/kyd/#">Submit! </a>
+					<button type="submit" class="btn btn-lg btn-success btn-block shake" style=" width:400px;">Submit</button>
 				</form>
 			</div>
 		</div>
 	</div>
-	
-
-	
+		<span th:if="${reg_estado}== incompleto">
+		<script th:inline="javascript">
+		swal("", {
+			  title: "Por Favor Complete su registracion con las siguientes preguntas!!",
+			  icon: "warning",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>
+		<script th:inline="javascript">
+		swal("", {
+			  title: "Por cavor complete su registracion con las siguientes preguntas!",
+			  icon: "warning",
+			  text:"******No se permite Copiar o Pegar las respuestas. En caso de que lo hace, el sistema negará su registracion.****",
+			  buttons:false,
+			  timer:6000,
+		});	
+		</script>
 	</body>
 </html>

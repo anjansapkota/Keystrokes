@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.json.JSONArray;
+import javax.validation.Valid;
+
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -13,16 +14,14 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 
 import com.um.model.Key;
 import com.um.model.Usuario;
@@ -31,7 +30,10 @@ import com.um.service.LaboratoryService;
 import com.um.service.UsuarioService;
 
 @Controller
-public class KeysController {
+public class KeysManagementController {
+	
+	@Autowired
+	private UsuarioService usuarioService;
 	@Autowired
 	private KMS kms;
 	@Autowired
@@ -42,6 +44,7 @@ public class KeysController {
 	List<JSONObject> keys = new ArrayList<>();
 	private Authentication auth;	
 	private int key = 0; //to avoid error 500 for refresh
+	
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
 	public ResponseEntity<Object> refresh(@RequestBody String json) throws JSONException, ParseException {
 		//method to validate typing

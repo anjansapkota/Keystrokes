@@ -25,4 +25,8 @@ public interface UsuarioService {
 	
 	public int changePassword(Usuario usuario);
 	
+	public int checkRegistrationStatus(Usuario usuario);
+
+	public int RegistrationCompleted(String matricula) ;
+	
 }
