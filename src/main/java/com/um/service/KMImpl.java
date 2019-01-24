@@ -2,6 +2,7 @@ package com.um.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +15,15 @@ import com.um.model.Key;
 import com.um.model.Usuario;
 @Service("kmService")
 public class KMImpl implements KmService {
-	@Autowired
-	@Qualifier("postgresJdbcTemplate")
-	private JdbcTemplate postgresTemplate;
+	 @Autowired
+		@Qualifier("postgresJdbcTemplate")
+		private JdbcTemplate postgresTemplate;
+	 @Autowired
+	 UsuarioService us;
 	@Override
 	public int personexists(String matricula){
-		int personID = 0;
-		Vector <Usuario> personas =  new Vector();
-		String query = "SELECT * FROM USUARIO";
-		postgresTemplate.query(query, new RowCallbackHandler()	{
-			public void processRow(ResultSet rs) throws SQLException {		
-				while (rs.next()) {
-			    	Usuario personTemp = new Usuario();
-			    	personTemp.setId(rs.getInt("ID"));
-			    	personTemp.setNombre(rs.getString("NOMBRE"));
-			    	personTemp.setMatricula(rs.getString("MATRICULA"));
-			    	personas.add(personTemp);
-			    }							
-		   }
-		});
-		
+		int personID=0;
+		ArrayList <Usuario> personas = us.listaUsuarios();
 		for (int i = 0; i < personas.size(); i++) {
 			if(((personas.get(i)).getMatricula()).equals(matricula)){
 				personID = (personas.get(i)).getId();
@@ -62,7 +52,7 @@ public class KMImpl implements KmService {
 	public Vector <Usuario> bringlistofPersons(){
 		Vector <Usuario> personas =  new Vector();
 		String query = "SELECT * FROM USUARIO";
-		postgresTemplate.query(query, new RowCallbackHandler()	{
+		postgresTemplate.query(query, new Object[]{}, new RowCallbackHandler()	{
 			public void processRow(ResultSet rs) throws SQLException {		
 				while (rs.next()) {
 			    	Usuario personTemp = new Usuario();

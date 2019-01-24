@@ -2,6 +2,7 @@ package com.um.controller;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.um.model.Key;
+import com.um.model.Result;
 import com.um.model.Usuario;
 import com.um.service.KmService;
 import com.um.service.LaboratoryService;
@@ -40,7 +42,9 @@ public class KeysManagementController {
 	@Autowired
 	private KmService kmService;
 	Vector <Key> listofKeysRecieved = new Vector<>();
+	Vector <Key> listofKeysExpectedUser = new Vector<>();
 	List<JSONObject> keys = new ArrayList<>();
+	HashMap<String, Result> ResultTable = new HashMap<String, Result>();
 	private Authentication auth;	
 	private int key = 0; //to avoid error 500 for refresh
 	
@@ -61,6 +65,25 @@ public class KeysManagementController {
 				listofKeysRecieved.add(tempkey);				
 			}
 			key = 1;
+		}
+		if(listofKeysRecieved.size()%50==1) {
+		auth = SecurityContextHolder.getContext().getAuthentication();
+		String matriculaEnTexto = auth.getName();
+		
+		try {
+			listofKeysExpectedUser = kmService.retrieveKeysFromDB(matriculaEnTexto);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			lbs.bringAllData(ResultTable);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ResultTable = lbs.MapResultsOfUsers(ResultTable);
+		ResultTable = lbs.checkMatches(ResultTable, listofKeysRecieved, listofKeysExpectedUser, matriculaEnTexto);
 		}
 		int response = 1;
 		return new ResponseEntity<Object>(response, HttpStatus.OK);

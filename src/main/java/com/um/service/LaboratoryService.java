@@ -1,21 +1,27 @@
 package com.um.service;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.um.model.Key;
+import com.um.model.Result;
 
 public interface LaboratoryService {
-
-	Vector<Object> bringAllData() throws SQLException;
-
 	void printVector(Vector<Key> printingList, String name);
-
-	void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 
 	int checkIfCopyPasted(Vector<Key> listofKeysRecieved);
 
-	void checkMatches(Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name);
+	Vector<Object> bringAllData(HashMap<String, Result> ResultTable) throws SQLException;
 
-	void correlationtest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
+	HashMap<String, Result> tTest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2,
+			String Name);
+
+	HashMap<String, Result> checkMatches(HashMap<String, Result> ResultTable, Vector<Key> persona1Summary,
+			Vector<Key> personaPruebaSummary, String Name);
+
+	HashMap<String, Result> correlationtest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2,
+			String Name);
+
+	HashMap<String, Result> MapResultsOfUsers(HashMap<String, Result> ResultTable);
 }

@@ -2,6 +2,7 @@ package com.um.service;
 import java.sql.SQLException;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,15 @@ import org.apache.commons.math3.stat.inference.TTest;
 public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
 	private KmService kmService;
+	@Autowired
+	 UsuarioService us;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
-    private static long P1R1  = 1000000;
-    private static long P1P2  = 1000000;
-    private static long R1P2  = 1000000;
-    private static long R1R2  = 1000000;
-    private static int[] timesUsersMatched;
-    HashMap<String, Result> ResultTable = new HashMap<String, Result>();    
+    private static long P1R1  = 1000;
+    private static long P1P2  = 1000;
+    private static long R1P2  = 1000;
+    private static long R1R2  = 1000;   
 	@Override
-	public Vector <Object> bringAllData() throws SQLException {
+	public Vector <Object> bringAllData(HashMap<String, Result> ResultTable) throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
 		Vector <Usuario> personas = kmService.bringlistofPersons();
 		Vector<String> userNames =  new Vector<String>();
@@ -47,12 +48,24 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		for (int i = 0; i < userNames.size(); i++) {
 			ResultTable.put(userNames.get(i), res);
 		}
-		timesUsersMatched = new int[userNames.size()];
 		AllData.add(keys4mdbEvry1);
 		AllData.add(userNames);
 		return AllData ;	//All data is an array of objects, where the first object is the array of list of keycombinations of all the users from the database and the second is
 							//the usernames of all the users.
 	}
+	
+	@Override
+    public HashMap<String, Result> MapResultsOfUsers(HashMap<String, Result> ResultTable){
+		ArrayList <Usuario> userNames = us.listaUsuarios();
+		
+		Result res = new Result();
+		for (int i = 0; i < userNames.size(); i++) {
+			ResultTable.put(userNames.get(i).getMatricula(), res);
+		}
+		return ResultTable;
+    }
+
+	
 	
 	@Override
     public void printVector(Vector<Key> printingList, String name){
@@ -66,7 +79,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	System.out.println();
     }
 	@Override
-    public void tTest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {   	
+    public HashMap<String, Result> tTest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {   	
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];
     	double[] sample1C = new double[teclaList1.size()];
@@ -88,7 +101,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		sample2C[i] = teclaList2.get(i).getRelease1_press2();
     		sample2D[i] = teclaList2.get(i).getRelease1_release2();
 		}
-    	T_Test tTestResult = null;
+    	T_Test tTestResult = new T_Test();
 		double pValuePress1_release1;
 		double pValuePress1_press2;
 		double pValueRelease1_press2;
@@ -105,10 +118,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		tTestResult.setD(pValueRelease1_release2);
 		ResultTable.get(Name).settTestResult(tTestResult);
 		System.out.println("T-Test Results : " + "P1R1: " + pValuePress1_release1 + " y " + "P1P2: " + pValuePress1_press2 + "R1P2: " + pValueRelease1_press2 + "R1R2: " + pValueRelease1_release2 );
+		return ResultTable;
+		
     }
 	
 	@Override
-	public void checkMatches(Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
+	public HashMap<String, Result> checkMatches(HashMap<String, Result> ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
     	for(int i=1; i<personaPruebaSummary.size(); i++) {
@@ -148,12 +163,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		  }
     		}
          }
-    	
-    	correlationtest(teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+    	ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+    	return ResultTable;
     }
 	
 	@Override
-	public void correlationtest(Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {
+	public HashMap<String, Result> correlationtest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];
     	double[] sample1C = new double[teclaList1.size()];
@@ -176,7 +191,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		sample2D[i] = teclaList2.get(i).getRelease1_release2();
 		}
     	
-    	Corelation correlationTestResult = null;
+    	Corelation correlationTestResult = new Corelation();
 		double a;
 		double b;
 		double c;
@@ -193,6 +208,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			System.out.println("Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a) + " P1P2 " + Double.toString(b) + " is  R1P2:  " + Double.toString(c) + " is  R1R2:  " + Double.toString(d) );
 			ResultTable.get(Name).setCorrelationTestResult(correlationTestResult);
     	}
+    	return ResultTable;
     }
 	@Override
 	public int checkIfCopyPasted(Vector <Key> listofKeysRecieved) {

@@ -32,7 +32,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 				usuario.setId(rs.getInt("ID"));
 				usuario.setNombre(rs.getString("NOMBRE"));
 				usuario.setMatricula(rs.getString("MATRICULA"));
-				usuario.setPassword(rs.getString("PASSWORD"));
 				usuario.setActivo(rs.getInt("ACTIVO"));								
 		   }
 		});
@@ -49,14 +48,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 				usuario.setId(rs.getInt("ID"));
 				usuario.setNombre(rs.getString("NOMBRE"));
 				usuario.setMatricula(rs.getString("MATRICULA"));
-				usuario.setPassword(rs.getString("PASSWORD"));
 				usuario.setActivo(rs.getInt("ACTIVO"));								
 		   }
 		});
     	if(matricula.equals(usuario.getMatricula())) {
     		System.out.println("The Matricula Already Exists");
     		result=1;
-    		} else System.out.println("******* The Matricula Doesn't Exists");
+    		}
     	return result;
 	}
 	
@@ -72,7 +70,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 				usuario.setId(rs.getInt("ID"));
 				usuario.setNombre(rs.getString("NOMBRE"));
 				usuario.setMatricula(rs.getString("MATRICULA"));
-				usuario.setPassword(rs.getString("PASSWORD"));
 				usuario.setActivo(rs.getInt("ACTIVO"));								
 				usuarios.add(usuario);
 		   }
