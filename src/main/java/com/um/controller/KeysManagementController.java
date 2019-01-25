@@ -66,24 +66,21 @@ public class KeysManagementController {
 			}
 			key = 1;
 		}
-		if(listofKeysRecieved.size()%50==1) {
+		
+		
+		if(listofKeysRecieved.size()%56==0) {
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
-		
 		try {
 			listofKeysExpectedUser = kmService.retrieveKeysFromDB(matriculaEnTexto);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try {
-			lbs.bringAllData(ResultTable);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		ResultTable = lbs.MapResultsOfUsers(ResultTable);
 		ResultTable = lbs.checkMatches(ResultTable, listofKeysRecieved, listofKeysExpectedUser, matriculaEnTexto);
+		System.out.println("The user was matched " + ResultTable.get(matriculaEnTexto).getMatchesResult() + "Times.");
 		}
 		int response = 1;
 		return new ResponseEntity<Object>(response, HttpStatus.OK);

@@ -83,6 +83,7 @@ public class KMImpl implements KmService {
 			public void processRow(ResultSet rs) throws SQLException {		
 				while (rs.next()) {
 			    	Key temp = new Key();
+			    	temp.setId(rs.getInt("ID"));
 			    	temp.setLetter1(rs.getString("letter1"));
 			    	temp.setLetter2(rs.getString("letter2"));
 			    	temp.setPress1_release1(rs.getLong("press1_release1"));
@@ -96,5 +97,26 @@ public class KMImpl implements KmService {
 		
 		return teclasListadeBD;
 		}
+	
+	
+	@Override
+	public int deleteRepeatedKeys(String matricula)  throws SQLException{
+		Vector<Key> retrieveKeysFromDB = retrieveKeysFromDB(matricula);
+		String query = "DELETE FROM TECLA WHERE id = ?";
+		int a, count =0;
+		for (int i = 0; i < retrieveKeysFromDB.size(); i++) {
+			Key temp1 = retrieveKeysFromDB.get(i);
+			int b = 0;
+			if(i+1 < retrieveKeysFromDB.size()) {
+				Key temp2 = retrieveKeysFromDB.get(i+1);
+				if(temp1.getLetter1().equals(temp2.getLetter1()) && temp1.getLetter2().equals(temp2.getLetter2()) && temp1.getPress1_press2()== temp2.getPress1_press2()) {
+					Object[] parametros = new Object[]{temp2.getId()};
+					a = postgresTemplate.update(query, parametros);
+					count = count+a;
+				}
+			}
+		}
+		return count;
+	}
 
 }

@@ -1,0 +1,12 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.um.config.DBConfig",
+      "name": "spring.datasource",
+      "sourceMethod": "public javax.sql.DataSource postgresDataSource() ",
+      "type": "javax.sql.DataSource"
+    }
+  ],
+  "properties": []
+}

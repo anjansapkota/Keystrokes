@@ -24,10 +24,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
 	 UsuarioService us;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
-    private static long P1R1  = 1000;
-    private static long P1P2  = 1000;
-    private static long R1P2  = 1000;
-    private static long R1R2  = 1000;   
+    private static long P1R1  = 500;
+    private static long P1P2  = 500;
+    private static long R1P2  = 500;
+    private static long R1R2  = 500;   
 	@Override
 	public Vector <Object> bringAllData(HashMap<String, Result> ResultTable) throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
@@ -36,7 +36,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		for (int i = 0; i < personas.size(); i++) {
 			Vector <Key> registrosTemp = kmService.retrieveKeysFromDB(personas.get(i).getMatricula());
 			for(int jj=0; jj<registrosTemp.size(); jj++) {
-				if(registrosTemp.get(jj).getRelease1_press2() >= 2000000000) {
+				if(registrosTemp.get(jj).getRelease1_press2() >= 50000) {
 					registrosTemp.remove(jj);
 				}
 			}
@@ -134,28 +134,28 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     			  if(persona1Summary.get(j).getLetter1().equals(l1) && persona1Summary.get(j).getLetter2().equals(l2)) {
     					if((personaPruebaSummary.get(i).getPress1_release1() > persona1Summary.get(j).getPress1_release1()) && (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1() <= P1R1) || (personaPruebaSummary.get(i).getPress1_release1() < persona1Summary.get(j).getPress1_release1()) && (persona1Summary.get(j).getPress1_release1() - personaPruebaSummary.get(i).getPress1_release1() <= P1R1)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Time Difference "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
+    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_release1 "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     				
     					if((personaPruebaSummary.get(i).getPress1_press2() > persona1Summary.get(j).getPress1_press2()) && (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2() <= P1P2) || (personaPruebaSummary.get(i).getPress1_press2() < persona1Summary.get(j).getPress1_press2()) && (persona1Summary.get(j).getPress1_press2() - personaPruebaSummary.get(i).getPress1_press2() <= P1P2)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Time Difference "  + (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2()));
+    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_press2 "  + (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     					
     					if((personaPruebaSummary.get(i).getRelease1_press2() > persona1Summary.get(j).getRelease1_press2()) && (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2() <= R1P2) || (personaPruebaSummary.get(i).getRelease1_press2() < persona1Summary.get(j).getRelease1_press2()) && (persona1Summary.get(j).getRelease1_press2() - personaPruebaSummary.get(i).getRelease1_press2() <= R1P2)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Time Difference "  + (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2()));
+    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Release1_press2 "  + (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     					
     					if((personaPruebaSummary.get(i).getRelease1_release2() > persona1Summary.get(j).getRelease1_release2()) && (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2() <= R1R2) || (personaPruebaSummary.get(i).getRelease1_release2() < persona1Summary.get(j).getRelease1_release2()) && (persona1Summary.get(j).getRelease1_release2() - personaPruebaSummary.get(i).getRelease1_release2() <= R1R2)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Time Difference "  + (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2()));
+    						System.out.println("Found USER1 " + l1 + "  " + l2 + " Release1_release2 "  + (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}    					
