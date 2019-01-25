@@ -25,9 +25,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	 UsuarioService us;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
     private static long P1R1  = 500;
-    private static long P1P2  = 500;
-    private static long R1P2  = 500;
-    private static long R1R2  = 500;   
+    private static long P1P2  = 100;
+    private static long R1P2  = 100;
+    private static long R1R2  = 100;   
 	@Override
 	public Vector <Object> bringAllData(HashMap<String, Result> ResultTable) throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
@@ -117,7 +117,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		tTestResult.setC(pValueRelease1_press2);
 		tTestResult.setD(pValueRelease1_release2);
 		ResultTable.get(Name).settTestResult(tTestResult);
-		System.out.println("T-Test Results : " + "P1R1: " + pValuePress1_release1 + " y " + "P1P2: " + pValuePress1_press2 + "R1P2: " + pValueRelease1_press2 + "R1R2: " + pValueRelease1_release2 );
+		System.out.println("T-Test Results : " + "P1R1: " + pValuePress1_release1 + " and " + "P1P2: " + pValuePress1_press2 + " and " + "R1P2: " + pValueRelease1_press2 + " and " + "R1R2: " + pValueRelease1_release2 );
 		return ResultTable;
 		
     }
@@ -163,7 +163,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		  }
     		}
          }
-    	ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+    	if(teclasIgualespersonaPrueba.size() > 3) {
+    		ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+        	ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+    	}    	
     	return ResultTable;
     }
 	
@@ -214,10 +217,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	public int checkIfCopyPasted(Vector <Key> listofKeysRecieved) {
 		int a=0;
 		for (int i = 0; i < listofKeysRecieved.size(); i++) {
-			if(listofKeysRecieved.get(i).getLetter1()=="ctrl") {
-				if(listofKeysRecieved.get(i).getLetter2()=="v" || listofKeysRecieved.get(i).getLetter2()=="V") {
+			if(listofKeysRecieved.get(i).getLetter1().equals("ctrlv")) {
+				//if(listofKeysRecieved.get(i).getLetter2().equals("v") || listofKeysRecieved.get(i).getLetter2().equals("V")) {
 					a = 1;
-				}
+				//}
 			}
 		}
 		return a;

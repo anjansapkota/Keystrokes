@@ -54,12 +54,17 @@ function keydown(e) {
 	else if(e.keyCode==13){
 		KN = "enter";
 	}
+	
+	if(e.ctrlKey && e.keyCode==86){
+		KN = "ctrlv";
+	}
 }
 
 function kp(e) {
 	if(!e.ctrlKey && !e.altKey && !e.shiftKey && !e.backspaceKey && e.keyCode!=46 && e.keyCode!=32 && e.keyCode!=20 && e.keyCode!=37 && e.keyCode!=38 && e.keyCode!=39 && e.keyCode!=40 && e.keyCode!=13){
 		KN = String.fromCharCode(e.which);
 	}
+	
 }
 
 function keyup(e) {
@@ -102,6 +107,14 @@ function ajaxFire(list) {
 					data : JSON.stringify(list),
 					dataType : 'json',
 					success : function(result) {
+						if(result ==2){
+							swal("", {
+								  title: "Copy Paste Detected! Your answer will not be received by the System!",
+								  icon: "error",
+								  buttons:false,
+								  timer:5000
+							});
+						}
 					},
 					error : function(e) {
 						console.log("ERROR: ", e);

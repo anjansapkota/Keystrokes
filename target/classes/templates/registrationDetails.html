@@ -28,12 +28,12 @@
 				<form id="answerform" th:action="@{/reg_complete}" method="POST">
 				<h1 style="color: Black; font-size: 60px;" >Why did you choose this career, how is your world view, explain in about 300 words?</h1>
 					<div class="form-group">
-   						 <textarea id="textWhyChose" name="textWhyChose" class="form-control" rows="20"></textarea>
+   						 <textarea id="textWhyChose" name="textWhyChose" class="form-control" rows="20" oncopy="return false" oncut="return false" onpaste="return false"></textarea>
   					</div><br></br>
   					
   				<h1 style="color: Black; font-size: 60px;" >Write an essay about yourself in about 500 words?</h1>
 					<div class="form-group">
-   						 <textarea id="textEssay" name="textEssay" class="form-control" rows="20"></textarea>
+   						 <textarea id="textEssay" name="textEssay" class="form-control" rows="20" oncopy="return false" oncut="return false" onpaste="return false"></textarea>
   					</div><br></br>	
 					<button type="submit" class="btn btn-lg btn-success btn-block shake" style=" width:400px;">Submit</button>
 				</form>
@@ -43,7 +43,7 @@
 		<span th:if="${reg_estado}== incompleto">
 		<script th:inline="javascript">
 		swal("", {
-			  title: "Por Favor Complete su registracion con las siguientes preguntas!!",
+			  title: "Please Complete Your Registration First!",
 			  icon: "warning",
 			  buttons:false,
 			  timer:2000,
@@ -52,9 +52,8 @@
 		</span>
 		<script th:inline="javascript">
 		swal("", {
-			  title: "Por cavor complete su registracion con las siguientes preguntas!",
-			  icon: "warning",
-			  text:"******No se permite Copiar o Pegar las respuestas. En caso de que lo hace, el sistema negará su registracion.****",
+			  title: "Please Complete Your Registration answering the following!",
+			  text:"**Please do not copy paste**",
 			  buttons:false,
 			  timer:6000,
 		});	

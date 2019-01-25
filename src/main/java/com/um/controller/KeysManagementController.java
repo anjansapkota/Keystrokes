@@ -53,6 +53,10 @@ public class KeysManagementController {
 		//method to validate typing
 		JSONParser parser = new JSONParser();
 		keys = (List<JSONObject>) parser.parse(json);
+		if(keys.size()<=7) {
+			listofKeysRecieved= new Vector<Key>();
+			ResultTable = new HashMap<String, Result>();
+		}
 		for (int i = 0; i < keys.size(); i++) {
 			Key tempkey = new Key();
 			if(key > 0) {
@@ -67,8 +71,7 @@ public class KeysManagementController {
 			key = 1;
 		}
 		
-		
-		if(listofKeysRecieved.size()%56==0) {
+		if(listofKeysRecieved.size()%100<9) {
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
 		try {
@@ -83,6 +86,11 @@ public class KeysManagementController {
 		System.out.println("The user was matched " + ResultTable.get(matriculaEnTexto).getMatchesResult() + "Times.");
 		}
 		int response = 1;
+		int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
+		if(aaa == 1) {
+			response=2;
+		}
+		
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 	
