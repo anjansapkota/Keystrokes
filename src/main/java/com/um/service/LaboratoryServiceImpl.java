@@ -16,6 +16,9 @@ import com.um.model.Usuario;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.inference.TTest;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -211,8 +214,90 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			System.out.println("Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a) + " P1P2 " + Double.toString(b) + " is  R1P2:  " + Double.toString(c) + " is  R1R2:  " + Double.toString(d) );
 			ResultTable.get(Name).setCorrelationTestResult(correlationTestResult);
     	}
+    	checkNormalDistribution(sample1A);
+    	checkNormalDistribution(sample1B);
+    	checkNormalDistribution(sample1C);
+    	checkNormalDistribution(sample1D);
     	return ResultTable;
     }
+	
+	@Override
+	public double checkNormalDistribution(double[] sample) {
+		double k=0;
+		double aa ;
+		
+		NormalDistribution normaldist = new NormalDistribution(standardDeV(sample), Mean(sample) );
+		
+		DecimalFormat df = new DecimalFormat("#.00000");
+		aa = normaldist.cumulativeProbability(0-standardDeV(sample),standardDeV(sample) );
+		//= Double.parseDouble(df.format(normaldist.sample()));
+		
+		aa= Double.parseDouble(df.format(aa));
+		System.out.println("Normal Dist: " + aa);
+		return aa;
+	}
+	
+	@Override
+	public double standardDeV(double[] sample) {
+		double a=0;
+		StandardDeviation sd = new StandardDeviation();
+		 a = sd.evaluate(sample);
+		return a;
+	}
+	
+	@Override
+	public double Mean(double[] sample) {
+		double a=0;
+		Mean mean = new Mean();
+		 a = mean.evaluate(sample);
+		return a;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public int checkIfCopyPasted(Vector <Key> listofKeysRecieved) {
 		int a=0;
@@ -225,6 +310,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		}
 		return a;
 	}
+	
+	
 	
 	
 	

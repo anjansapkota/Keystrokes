@@ -48,6 +48,7 @@ public class KeysManagementController {
 	private Authentication auth;	
 	private int key = 0; //to avoid error 500 for refresh
 	
+	//reveiving keys to validate the user
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
 	public ResponseEntity<Object> refresh(@RequestBody String json) throws JSONException, ParseException {
 		//method to validate typing
@@ -57,7 +58,7 @@ public class KeysManagementController {
 			listofKeysRecieved= new Vector<Key>();
 			ResultTable = new HashMap<String, Result>();
 		}
-		for (int i = 0; i < keys.size(); i++) {
+		for (int i = 0; i < keys.size(); i++) {					//converting json array to model.key array
 			Key tempkey = new Key();
 			if(key > 0) {
 				tempkey.setLetter1((String) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
@@ -71,7 +72,7 @@ public class KeysManagementController {
 			key = 1;
 		}
 		
-		if(listofKeysRecieved.size()%100<9) {
+		if(listofKeysRecieved.size()%100<9) {			//to test every 100 keys
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
 		try {

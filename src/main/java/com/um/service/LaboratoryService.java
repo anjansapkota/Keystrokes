@@ -24,4 +24,10 @@ public interface LaboratoryService {
 			String Name);
 
 	HashMap<String, Result> MapResultsOfUsers(HashMap<String, Result> ResultTable);
+
+		double standardDeV(double[] sample);
+
+	double Mean(double[] sample);
+
+	double checkNormalDistribution(double[] sample);
 }
