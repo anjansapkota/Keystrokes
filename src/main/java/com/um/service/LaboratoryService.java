@@ -29,5 +29,7 @@ public interface LaboratoryService {
 
 	double Mean(double[] sample);
 
-	double checkNormalDistribution(double[] sample);
+	double checkNormalDistribution(double[] sample, double lowerbound, double upperbound);
+
+	double distributionanalysis(double[] sample, double[] sample2);
 }

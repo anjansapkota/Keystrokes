@@ -8,7 +8,9 @@ import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.um.model.CollectionOfPairedDigraphs;
 import com.um.model.Corelation;
+import com.um.model.IndividialDigraphsSet;
 import com.um.model.Key;
 import com.um.model.Result;
 import com.um.model.T_Test;
@@ -127,14 +129,76 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	@Override
 	public HashMap<String, Result> checkMatches(HashMap<String, Result> ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
+		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
+		HashMap<String, IndividialDigraphsSet> collectionPD = new HashMap<String, IndividialDigraphsSet> ();  //collection_of_paired_diagraphs_of_both_persons
+		
+		IndividialDigraphsSet IDS = new IndividialDigraphsSet();
+		CollectionOfPairedDigraphs CPD = new CollectionOfPairedDigraphs();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		Vector <Object> MatchedDigraphs = new Vector <Object>();  //no matter the value of any variables, its a set of collections of same recurring digraphs
+		Vector<Key> tempMatchedDigraphspersona1 = new Vector <Key> ();
+		Vector<Key> tempMatchedDigraphpersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
     	for(int i=1; i<personaPruebaSummary.size(); i++) {
+    		int confirmation = 0;
     		String l1 = personaPruebaSummary.get(i).getLetter1();
         	String l2 = personaPruebaSummary.get(i).getLetter2();
-    		for(int j=0; j<personaPruebaSummary.size(); j++) {
+    		for(int j=0; j<persona1Summary.size(); j++) {
     		  if(j<persona1Summary.size() && i<personaPruebaSummary.size()){
     			  if(persona1Summary.get(j).getLetter1().equals(l1) && persona1Summary.get(j).getLetter2().equals(l2)) {
+    				  String digraph = l1+l2;
+    				  if(!collectionPD.containsKey(digraph)) {
+    					  Vector<Key> tempkeys = new Vector <Key> ();
+    					  HashMap<String, Vector> temphashIDS = new HashMap<String, Vector> ();
+    					  temphashIDS.put("RealUser", tempkeys);
+    					  temphashIDS.put("UserTesting", tempkeys);
+    					  collectionPD.get(digraph).setIDS(temphashIDS);
+    				  }else {
+    					  collectionPD.get(digraph).getIDS().get("UserTesting").add(personaPruebaSummary.get(i));
+    					  collectionPD.get(digraph).getIDS().get("RealUser").add(persona1Summary.get(j));
+    					  
+    				  }
+    				  
+    				  
+    				  
+    				  
+    				  
+    				  
+    				  
+    				  if(confirmation == 0) {
+    					  tempMatchedDigraphpersonaPrueba.add(personaPruebaSummary.get(i));
+    					  confirmation = 1;
+    				  }    				 
+    				  tempMatchedDigraphspersona1.add(persona1Summary.get(j));
+    				  
     					if((personaPruebaSummary.get(i).getPress1_release1() > persona1Summary.get(j).getPress1_release1()) && (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1() <= P1R1) || (personaPruebaSummary.get(i).getPress1_release1() < persona1Summary.get(j).getPress1_release1()) && (persona1Summary.get(j).getPress1_release1() - personaPruebaSummary.get(i).getPress1_release1() <= P1R1)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
     						System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_release1 "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
@@ -166,6 +230,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		  }
     		}
          }
+    	
+    	
+    	
+    	
     	if(teclasIgualespersonaPrueba.size() > 3) {
     		ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
         	ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
@@ -221,15 +289,24 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	return ResultTable;
     }
 	
+	
 	@Override
-	public double checkNormalDistribution(double[] sample) {
-		double k=0;
+	public double distributionanalysis(double[] sample, double[] sample2) {
+		double x=0;
+		
+		return x;
+	}
+		
+	
+	@Override
+	public double checkNormalDistribution(double[] sample, double lowerbound, double upperbound) {
+		double x=0;
 		double aa ;
 		
 		NormalDistribution normaldist = new NormalDistribution(standardDeV(sample), Mean(sample) );
 		
 		DecimalFormat df = new DecimalFormat("#.00000");
-		aa = normaldist.cumulativeProbability(0-standardDeV(sample),standardDeV(sample) );
+		aa = normaldist.cumulativeProbability(lowerbound,upperbound);
 		//= Double.parseDouble(df.format(normaldist.sample()));
 		
 		aa= Double.parseDouble(df.format(aa));
