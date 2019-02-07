@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -131,74 +132,34 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	public HashMap<String, Result> checkMatches(HashMap<String, Result> ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		HashMap<String, IndividialDigraphsSet> collectionPD = new HashMap<String, IndividialDigraphsSet> ();  //collection_of_paired_diagraphs_of_both_persons
-		
-		IndividialDigraphsSet IDS = new IndividialDigraphsSet();
-		CollectionOfPairedDigraphs CPD = new CollectionOfPairedDigraphs();
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		Vector <Object> MatchedDigraphs = new Vector <Object>();  //no matter the value of any variables, its a set of collections of same recurring digraphs
-		Vector<Key> tempMatchedDigraphspersona1 = new Vector <Key> ();
-		Vector<Key> tempMatchedDigraphpersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
-    	for(int i=1; i<personaPruebaSummary.size(); i++) {
+    	for(int i=1; i<personaPruebaSummary.size(); i++) {                //Prueba is i              //person is j
     		int confirmation = 0;
     		String l1 = personaPruebaSummary.get(i).getLetter1();
         	String l2 = personaPruebaSummary.get(i).getLetter2();
     		for(int j=0; j<persona1Summary.size(); j++) {
     		  if(j<persona1Summary.size() && i<personaPruebaSummary.size()){
     			  if(persona1Summary.get(j).getLetter1().equals(l1) && persona1Summary.get(j).getLetter2().equals(l2)) {
+    				//no matter the value of any variables, its a set of collections of same recurring digraphs
     				  String digraph = l1+l2;
     				  if(!collectionPD.containsKey(digraph)) {
     					  Vector<Key> tempkeys = new Vector <Key> ();
-    					  HashMap<String, Vector> temphashIDS = new HashMap<String, Vector> ();
-    					  temphashIDS.put("RealUser", tempkeys);
-    					  temphashIDS.put("UserTesting", tempkeys);
-    					  collectionPD.get(digraph).setIDS(temphashIDS);
+    					  IndividialDigraphsSet ids = new IndividialDigraphsSet();
+    					  tempkeys.add(personaPruebaSummary.get(i));
+    					  tempkeys.add(persona1Summary.get(j));
+    					  ids.setPrueba(tempkeys);
+    					  ids.setPerson(tempkeys);
+    					  collectionPD.put(digraph, ids);
     				  }else {
-    					  collectionPD.get(digraph).getIDS().get("UserTesting").add(personaPruebaSummary.get(i));
-    					  collectionPD.get(digraph).getIDS().get("RealUser").add(persona1Summary.get(j));
-    					  
+    					  if(confirmation==0) {										//to avoid duplication of keys(model) while sorting out common digraphs.
+    						  collectionPD.get(digraph).getPrueba().add(personaPruebaSummary.get(i));
+    						  confirmation = 1;
+    					  }
+    					  collectionPD.get(digraph).getPerson().add(persona1Summary.get(j));    					  
     				  }
     				  
-    				  
-    				  
-    				  
-    				  
-    				  
-    				  
-    				  if(confirmation == 0) {
-    					  tempMatchedDigraphpersonaPrueba.add(personaPruebaSummary.get(i));
-    					  confirmation = 1;
-    				  }    				 
-    				  tempMatchedDigraphspersona1.add(persona1Summary.get(j));
-    				  
+    				  //Matching Analysis and sorting out common key press
     					if((personaPruebaSummary.get(i).getPress1_release1() > persona1Summary.get(j).getPress1_release1()) && (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1() <= P1R1) || (personaPruebaSummary.get(i).getPress1_release1() < persona1Summary.get(j).getPress1_release1()) && (persona1Summary.get(j).getPress1_release1() - personaPruebaSummary.get(i).getPress1_release1() <= P1R1)  ) {
     						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
     						System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_release1 "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
@@ -237,6 +198,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	if(teclasIgualespersonaPrueba.size() > 3) {
     		ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
         	ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
+        	distributionanalysis(collectionPD);
     	}    	
     	return ResultTable;
     }
@@ -282,18 +244,47 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			System.out.println("Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a) + " P1P2 " + Double.toString(b) + " is  R1P2:  " + Double.toString(c) + " is  R1R2:  " + Double.toString(d) );
 			ResultTable.get(Name).setCorrelationTestResult(correlationTestResult);
     	}
-    	checkNormalDistribution(sample1A);
-    	checkNormalDistribution(sample1B);
-    	checkNormalDistribution(sample1C);
-    	checkNormalDistribution(sample1D);
     	return ResultTable;
     }
 	
-	
+
 	@Override
-	public double distributionanalysis(double[] sample, double[] sample2) {
+	public double distributionanalysis( HashMap<String, IndividialDigraphsSet> digraphsCollection) {
 		double x=0;
-		
+		double[] distResult= new  double [digraphsCollection.size()];
+		for(int a = 0; a<digraphsCollection.size(); a++) {
+				@SuppressWarnings("unchecked")
+				HashMap<String, IndividialDigraphsSet> entry = (HashMap<String, IndividialDigraphsSet>) digraphsCollection.entrySet().iterator().next();
+				String digraph = ((Entry<String, IndividialDigraphsSet>) entry).getKey();
+				IndividialDigraphsSet ids = ((Entry<String, IndividialDigraphsSet>) entry).getValue();
+				Vector<Key> teclaList1 = ids.getPrueba();  //that particular digraph of person prueba
+				Vector<Key> teclaList2 = ids.getPerson();				//that particular digraph of the real person or expected user
+				double[] sample1A = new double[teclaList1.size()];
+		    	double[] sample1B = new double[teclaList1.size()];
+		    	double[] sample1C = new double[teclaList1.size()];
+		    	double[] sample1D = new double[teclaList1.size()];
+		    	for (int i = 0; i < teclaList1.size(); i++) {
+		    		sample1A[i]= teclaList1.get(i).getPress1_release1();
+		    		sample1B[i] = teclaList1.get(i).getPress1_press2();
+		    		sample1C[i] = teclaList1.get(i).getRelease1_press2();
+		    		sample1D[i] = teclaList1.get(i).getRelease1_release2();
+				}
+		    	
+		    	double[] sample2A = new double[teclaList2.size()];
+		    	double[] sample2B = new double[teclaList2.size()];
+		    	double[] sample2C = new double[teclaList2.size()];
+		    	double[] sample2D = new double[teclaList2.size()];
+		    	for (int i = 0; i < teclaList2.size(); i++) {
+		    		sample2A[i]= teclaList2.get(i).getPress1_release1();
+		    		sample2B[i] = teclaList2.get(i).getPress1_press2();
+		    		sample2C[i] = teclaList2.get(i).getRelease1_press2();
+		    		sample2D[i] = teclaList2.get(i).getRelease1_release2();
+				}
+		   double lb = Mean(sample1A) - standardDeV(sample1A);
+		   double ub = Mean(sample1A) + standardDeV(sample1A);
+		   distResult[a] = checkNormalDistribution(sample2A,lb,ub);
+		   System.out.println("Probability of " + digraph + " is "+ distResult[a]);
+		}
 		return x;
 	}
 		

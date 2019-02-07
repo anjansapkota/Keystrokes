@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+import com.um.model.IndividialDigraphsSet;
 import com.um.model.Key;
 import com.um.model.Result;
 
@@ -31,5 +32,5 @@ public interface LaboratoryService {
 
 	double checkNormalDistribution(double[] sample, double lowerbound, double upperbound);
 
-	double distributionanalysis(double[] sample, double[] sample2);
+	double distributionanalysis(HashMap<String, IndividialDigraphsSet> digraphsCollection);
 }
