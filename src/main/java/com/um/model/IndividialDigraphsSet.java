@@ -1,8 +1,17 @@
 package com.um.model;
 
 public class IndividialDigraphsSet {
+	String digraph ="";
 	java.util.Vector<Key> Prueba = new java.util.Vector <Key> ();
 	java.util.Vector<Key> Person = new java.util.Vector <Key> ();
+	
+	
+	public String getDigraph() {
+		return digraph;
+	}
+	public void setDigraph(String diagraph) {
+		this.digraph = diagraph;
+	}
 	public java.util.Vector<Key> getPrueba() {
 		return Prueba;
 	}

@@ -32,5 +32,5 @@ public interface LaboratoryService {
 
 	double checkNormalDistribution(double[] sample, double lowerbound, double upperbound);
 
-	double distributionanalysis(HashMap<String, IndividialDigraphsSet> digraphsCollection);
+	double distributionanalysis(IndividialDigraphsSet ids);
 }
