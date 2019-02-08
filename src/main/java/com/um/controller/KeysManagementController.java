@@ -82,9 +82,9 @@ public class KeysManagementController {
 			e.printStackTrace();
 		}
 
-		ResultTable = lbs.MapResultsOfUsers(ResultTable);
-		ResultTable = lbs.checkMatches(ResultTable, listofKeysRecieved, listofKeysExpectedUser, matriculaEnTexto);
-		System.out.println("The user was matched " + ResultTable.get(matriculaEnTexto).getMatchesResult() + "Times.");
+		Result ResultTable = new Result();
+		ResultTable = lbs.checkMatches(ResultTable,listofKeysExpectedUser, listofKeysRecieved, matriculaEnTexto);
+		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
 		}
 		int response = 1;
 		int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);

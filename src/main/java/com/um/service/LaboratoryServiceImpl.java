@@ -33,7 +33,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     private static long R1P2  = 100;
     private static long R1R2  = 100;   
 	@Override
-	public Vector <Object> bringAllData(HashMap<String, Result> ResultTable) throws SQLException {
+	public Vector <Object> bringAllData(Result ResultTable) throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
 		Vector <Usuario> personas = kmService.bringlistofPersons();
 		Vector<String> userNames =  new Vector<String>();
@@ -48,28 +48,11 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			printVector(registrosTemp,personas.get(i).getNombre());
 			userNames.add(personas.get(i).getNombre());
 		}
-		Result res = null;
-		for (int i = 0; i < userNames.size(); i++) {
-			ResultTable.put(userNames.get(i), res);
-		}
 		AllData.add(keys4mdbEvry1);
 		AllData.add(userNames);
 		return AllData ;	//All data is an array of objects, where the first object is the array of list of keycombinations of all the users from the database and the second is
 							//the usernames of all the users.
 	}
-	
-	@Override
-    public HashMap<String, Result> MapResultsOfUsers(HashMap<String, Result> ResultTable){
-		ArrayList <Usuario> userNames = us.listaUsuarios();
-		
-		Result res = new Result();
-		for (int i = 0; i < userNames.size(); i++) {
-			ResultTable.put(userNames.get(i).getMatricula(), res);
-		}
-		return ResultTable;
-    }
-
-	
 	
 	@Override
     public void printVector(Vector<Key> printingList, String name){
@@ -83,7 +66,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	System.out.println();
     }
 	@Override
-    public HashMap<String, Result> tTest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {   	
+    public Result tTest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {   	
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];
     	double[] sample1C = new double[teclaList1.size()];
@@ -120,16 +103,16 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		tTestResult.setB(pValuePress1_press2);
 		tTestResult.setC(pValueRelease1_press2);
 		tTestResult.setD(pValueRelease1_release2);
-		ResultTable.get(Name).settTestResult(tTestResult);
+		ResultTable.settTestResult(tTestResult);
 		System.out.println("T-Test Results : " + "P1R1: " + pValuePress1_release1 + " and " + "P1P2: " + pValuePress1_press2 + " and " + "R1P2: " + pValueRelease1_press2 + " and " + "R1R2: " + pValueRelease1_release2 );
 		return ResultTable;
 		
     }
 	
 	@Override
-	public HashMap<String, Result> checkMatches(HashMap<String, Result> ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
+	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
-		
+		int matchcount = 0;
 		HashMap<String, IndividialDigraphsSet> collectionPD = new HashMap<String, IndividialDigraphsSet> ();  //collection_of_paired_diagraphs_of_both_persons
 		Vector<String> digraphsList = new Vector<String>();
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
@@ -139,63 +122,62 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		String l1 = personaPruebaSummary.get(i).getLetter1();
         	String l2 = personaPruebaSummary.get(i).getLetter2();
     		for(int j=0; j<persona1Summary.size(); j++) {
-    		  if(j<persona1Summary.size() && i<personaPruebaSummary.size()){
     			  if(persona1Summary.get(j).getLetter1().equals(l1) && persona1Summary.get(j).getLetter2().equals(l2)) {
     				//no matter the value of any variables, its a set of collections of same recurring digraphs
     				  String digraph = l1+l2;
     				  if(!collectionPD.containsKey(digraph)) {
-    					  Vector<Key> tempkeys = new Vector <Key> ();
+    					  Vector<Key> tempkeys1 = new Vector <Key> ();
+    					  Vector<Key> tempkeys2 = new Vector <Key> ();
     					  IndividialDigraphsSet ids = new IndividialDigraphsSet();
-    					  tempkeys.add(personaPruebaSummary.get(i));
-    					  tempkeys.add(persona1Summary.get(j));
+    					  tempkeys1.add(personaPruebaSummary.get(i));
+    					  tempkeys2.add(persona1Summary.get(j));
     					  digraphsList.add(digraph);
     					  ids.setDigraph(digraph);
-    					  ids.setPrueba(tempkeys);
-    					  ids.setPerson(tempkeys);
+    					  ids.setPrueba(tempkeys1);
+    					  ids.setPerson(tempkeys2);
     					  collectionPD.put(digraph, ids);
-    				  }else {
-    					  if(confirmation==0) {										//to avoid duplication of keys(model) while sorting out common digraphs.
+    					  confirmation = 1;
+    				  }else if(confirmation==0) {										//to avoid duplication of keys(model) while sorting out common digraphs.
     						  collectionPD.get(digraph).getPrueba().add(personaPruebaSummary.get(i));
     						  confirmation = 1;
     					  }
     					  collectionPD.get(digraph).getPerson().add(persona1Summary.get(j));    					  
-    				  }
+    				  
     				  
     				  //Matching Analysis and sorting out common key press
     					if((personaPruebaSummary.get(i).getPress1_release1() > persona1Summary.get(j).getPress1_release1()) && (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1() <= P1R1) || (personaPruebaSummary.get(i).getPress1_release1() < persona1Summary.get(j).getPress1_release1()) && (persona1Summary.get(j).getPress1_release1() - personaPruebaSummary.get(i).getPress1_release1() <= P1R1)  ) {
-    						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						//System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_release1 "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
+    						matchcount++;
+    						System.out.println("Found match where i .. " + i +" j .. " +  j + "  " + " KEYID " +  persona1Summary.get(j).getId() + "  " + l1 + "  " + l2 + " Press1_release1 "  + (personaPruebaSummary.get(i).getPress1_release1() - persona1Summary.get(j).getPress1_release1()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     				
     					if((personaPruebaSummary.get(i).getPress1_press2() > persona1Summary.get(j).getPress1_press2()) && (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2() <= P1P2) || (personaPruebaSummary.get(i).getPress1_press2() < persona1Summary.get(j).getPress1_press2()) && (persona1Summary.get(j).getPress1_press2() - personaPruebaSummary.get(i).getPress1_press2() <= P1P2)  ) {
-    						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						//System.out.println("Found USER1 " + l1 + "  " + l2 + " Press1_press2 "  + (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2()));
+    						matchcount++;
+    						System.out.println("Found match where i .. " + i +" j .. " +  j + "  " + " KEYID " +  persona1Summary.get(j).getId() + "  " + l1 + "  " + l2 + " Press1_press2 "  + (personaPruebaSummary.get(i).getPress1_press2() - persona1Summary.get(j).getPress1_press2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     					
     					if((personaPruebaSummary.get(i).getRelease1_press2() > persona1Summary.get(j).getRelease1_press2()) && (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2() <= R1P2) || (personaPruebaSummary.get(i).getRelease1_press2() < persona1Summary.get(j).getRelease1_press2()) && (persona1Summary.get(j).getRelease1_press2() - personaPruebaSummary.get(i).getRelease1_press2() <= R1P2)  ) {
-    						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						//System.out.println("Found USER1 " + l1 + "  " + l2 + " Release1_press2 "  + (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2()));
+    						matchcount++;
+    						System.out.println("Found match where i .. " + i +" j .. " +  j + "  " + " KEYID " +  persona1Summary.get(j).getId() + "  " + l1 + "  " + l2 + " Release1_press2 "  + (personaPruebaSummary.get(i).getRelease1_press2() - persona1Summary.get(j).getRelease1_press2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}
     					
     					if((personaPruebaSummary.get(i).getRelease1_release2() > persona1Summary.get(j).getRelease1_release2()) && (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2() <= R1R2) || (personaPruebaSummary.get(i).getRelease1_release2() < persona1Summary.get(j).getRelease1_release2()) && (persona1Summary.get(j).getRelease1_release2() - personaPruebaSummary.get(i).getRelease1_release2() <= R1R2)  ) {
-    						ResultTable.get(Name).setMatchesResult(ResultTable.get(Name).getMatchesResult() + 1);
-    						//System.out.println("Found USER1 " + l1 + "  " + l2 + " Release1_release2 "  + (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2()));
+    						matchcount++;
+    						System.out.println("Found match where i .. " + i +" j .. " +  j + "  " + " KEYID " +  persona1Summary.get(j).getId() + "  " + l1 + "  " + l2 + " Release1_release2 "  + (personaPruebaSummary.get(i).getRelease1_release2() - persona1Summary.get(j).getRelease1_release2()));
     						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
     						teclasIgualesPersona1.add(persona1Summary.get(j));
     					}    					
+    			  	}
     			}
-    		  }
-    		}
-         }
+    		  
+    		}   	
     	
-    	
-    	
+    	ResultTable.setMatchesResult(matchcount);
     	double[] normality_results = new double[digraphsList.size()];
     	if(teclasIgualespersonaPrueba.size() > 3) {
     		ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
@@ -209,8 +191,82 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     	return ResultTable;
     }
 	
+
 	@Override
-	public HashMap<String, Result> correlationtest(HashMap<String, Result> ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {
+	public double distributionanalysis( IndividialDigraphsSet ids) {
+		double x=0;
+				Vector<Key> teclaList1 = ids.getPrueba();  //that particular digraph of person prueba
+				Vector<Key> teclaList2 = ids.getPerson();				//that particular digraph of the real person or expected user
+				
+				double[] sample1A = new double[teclaList1.size()];
+		    	double[] sample1B = new double[teclaList1.size()];
+		    	double[] sample1C = new double[teclaList1.size()];
+		    	double[] sample1D = new double[teclaList1.size()];
+		    	for (int i = 0; i < teclaList1.size(); i++) {
+		    		sample1A[i]= teclaList1.get(i).getPress1_release1();
+		    		sample1B[i] = teclaList1.get(i).getPress1_press2();
+		    		sample1C[i] = teclaList1.get(i).getRelease1_press2();
+		    		sample1D[i] = teclaList1.get(i).getRelease1_release2();
+				}
+		    	
+		    	double[] sample2A = new double[teclaList2.size()];
+		    	double[] sample2B = new double[teclaList2.size()];
+		    	double[] sample2C = new double[teclaList2.size()];
+		    	double[] sample2D = new double[teclaList2.size()];
+		    	for (int i = 0; i < teclaList2.size(); i++) {
+		    		sample2A[i]= teclaList2.get(i).getPress1_release1();
+		    		sample2B[i] = teclaList2.get(i).getPress1_press2();
+		    		sample2C[i] = teclaList2.get(i).getRelease1_press2();
+		    		sample2D[i] = teclaList2.get(i).getRelease1_release2();
+				}
+		   double mean = Mean(sample2A);
+		   double sd = standardDeV(sample2A);
+		   double lb = Mean(sample1A) - standardDeV(sample1A);
+		   double ub = Mean(sample1A) + standardDeV(sample1A);
+		   x = checkNormalDistribution(sample2A,lb,ub);
+		   printVector(teclaList1, ids.getDigraph());
+		   System.out.println("................................................................................................................................");
+		   printVector(teclaList2, ids.getDigraph());
+		   System.out.println("**********************************************************************************************************************************");
+		   System.out.println("Mean is " + mean +" and SD is "+sd);
+		   System.out.println("Lower Bound is " + lb + "     Upper Bound is" + ub + "     Probability of    " + ids.getDigraph() + "    is "+ x);
+		
+		return x;
+	}
+		
+	
+	@Override
+	public double checkNormalDistribution(double[] sample, double lowerbound, double upperbound) {
+		double aa ;
+		
+		NormalDistribution normaldist = new NormalDistribution(Mean(sample),standardDeV(sample) );
+		
+		DecimalFormat df = new DecimalFormat("#.00000");
+		aa = normaldist.cumulativeProbability(lowerbound,upperbound);
+		//= Double.parseDouble(df.format(normaldist.sample()));
+		
+		aa= Double.parseDouble(df.format(aa));
+		return aa;
+	}
+	
+	@Override
+	public double standardDeV(double[] sample) {
+		double a=0;
+		StandardDeviation sd = new StandardDeviation();
+		 a = sd.evaluate(sample);
+		return a;
+	}
+	
+	@Override
+	public double Mean(double[] sample) {
+		double a=0;
+		Mean mean = new Mean();
+		 a = mean.evaluate(sample);
+		return a;
+	}
+	
+	@Override
+	public Result correlationtest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name ) {
     	double[] sample1A = new double[teclaList1.size()];
     	double[] sample1B = new double[teclaList1.size()];
     	double[] sample1C = new double[teclaList1.size()];
@@ -248,78 +304,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	    	correlationTestResult.setC(c);
 	    	correlationTestResult.setD(d);
 			System.out.println("Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a) + " P1P2 " + Double.toString(b) + " is  R1P2:  " + Double.toString(c) + " is  R1R2:  " + Double.toString(d) );
-			ResultTable.get(Name).setCorrelationTestResult(correlationTestResult);
+			ResultTable.setCorrelationTestResult(correlationTestResult);
     	}
     	return ResultTable;
     }
-	
-
-	@Override
-	public double distributionanalysis( IndividialDigraphsSet ids) {
-		double x=0;
-				Vector<Key> teclaList1 = ids.getPrueba();  //that particular digraph of person prueba
-				Vector<Key> teclaList2 = ids.getPerson();				//that particular digraph of the real person or expected user
-				double[] sample1A = new double[teclaList1.size()];
-		    	double[] sample1B = new double[teclaList1.size()];
-		    	double[] sample1C = new double[teclaList1.size()];
-		    	double[] sample1D = new double[teclaList1.size()];
-		    	for (int i = 0; i < teclaList1.size(); i++) {
-		    		sample1A[i]= teclaList1.get(i).getPress1_release1();
-		    		sample1B[i] = teclaList1.get(i).getPress1_press2();
-		    		sample1C[i] = teclaList1.get(i).getRelease1_press2();
-		    		sample1D[i] = teclaList1.get(i).getRelease1_release2();
-				}
-		    	
-		    	double[] sample2A = new double[teclaList2.size()];
-		    	double[] sample2B = new double[teclaList2.size()];
-		    	double[] sample2C = new double[teclaList2.size()];
-		    	double[] sample2D = new double[teclaList2.size()];
-		    	for (int i = 0; i < teclaList2.size(); i++) {
-		    		sample2A[i]= teclaList2.get(i).getPress1_release1();
-		    		sample2B[i] = teclaList2.get(i).getPress1_press2();
-		    		sample2C[i] = teclaList2.get(i).getRelease1_press2();
-		    		sample2D[i] = teclaList2.get(i).getRelease1_release2();
-				}
-		   double lb = Mean(sample2A) - standardDeV(sample2A);
-		   double ub = Mean(sample2A) + standardDeV(sample2A);
-		   x = checkNormalDistribution(sample1A,lb,ub);
-		   System.out.println("Probability of " + ids.getDigraph() + " is "+ x);
-		
-		return x;
-	}
-		
-	
-	@Override
-	public double checkNormalDistribution(double[] sample, double lowerbound, double upperbound) {
-		double aa ;
-		
-		NormalDistribution normaldist = new NormalDistribution(standardDeV(sample), Mean(sample) );
-		
-		DecimalFormat df = new DecimalFormat("#.00000");
-		aa = normaldist.cumulativeProbability(lowerbound,upperbound);
-		//= Double.parseDouble(df.format(normaldist.sample()));
-		
-		aa= Double.parseDouble(df.format(aa));
-		return aa;
-	}
-	
-	@Override
-	public double standardDeV(double[] sample) {
-		double a=0;
-		StandardDeviation sd = new StandardDeviation();
-		 a = sd.evaluate(sample);
-		return a;
-	}
-	
-	@Override
-	public double Mean(double[] sample) {
-		double a=0;
-		Mean mean = new Mean();
-		 a = mean.evaluate(sample);
-		return a;
-	}
-	
-	
 	
 	
 	
