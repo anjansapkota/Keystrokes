@@ -20,8 +20,6 @@ public interface LaboratoryService {
 
 	double checkNormalDistribution(double[] sample, double lowerbound, double upperbound);
 
-	double distributionanalysis(IndividialDigraphsSet ids);
-
 	Vector<Object> bringAllData(Result ResultTable) throws SQLException;
 
 	Result tTest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
@@ -29,4 +27,8 @@ public interface LaboratoryService {
 	Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name);
 
 	Result correlationtest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
+
+	double probabilityanalysis(IndividialDigraphsSet ids);
+
+	double FindProbability(double[] sample, double x);
 }

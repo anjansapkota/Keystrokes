@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import javax.validation.Valid;
-
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,9 +42,10 @@ public class KeysManagementController {
 	List<JSONObject> keys = new ArrayList<>();
 	HashMap<String, Result> ResultTable = new HashMap<String, Result>();
 	private Authentication auth;	
-	private int key = 0; //to avoid error 500 for refresh
+	private int key = 0; //to avoid error 500 for refresh because it finds a keystroke with null letter1
 	
 	//reveiving keys to validate the user
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
 	public ResponseEntity<Object> refresh(@RequestBody String json) throws JSONException, ParseException {
 		//method to validate typing
@@ -94,6 +91,64 @@ public class KeysManagementController {
 		
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
+	
+	//collecting keys to from the user while regestering
+		@SuppressWarnings("unchecked")
+		@RequestMapping(value= {"/updateAnswer"}, method = RequestMethod.POST)
+		public ResponseEntity<Object> collectKeys(@RequestBody String json) throws JSONException, ParseException {
+			//method to validate typing
+			JSONParser parser = new JSONParser();
+			keys = (List<JSONObject>) parser.parse(json);
+			if(keys.size()<=7) {
+				listofKeysRecieved= new Vector<Key>();
+				ResultTable = new HashMap<String, Result>();
+			}
+			for (int i = 0; i < keys.size(); i++) {					//converting json array to model.key array
+				Key tempkey = new Key();
+				if(key > 0) {
+					tempkey.setLetter1((String) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
+					tempkey.setLetter2((String) keys.get(i).get("l2"));
+					tempkey.setPress1_press2((long) keys.get(i).get("p1p2"));
+					tempkey.setPress1_release1((long) keys.get(i).get("p1r1"));
+					tempkey.setRelease1_press2((long) keys.get(i).get("r1p2"));
+					tempkey.setRelease1_release2((long) keys.get(i).get("r1r2"));
+					listofKeysRecieved.add(tempkey);				
+				}
+				key = 1;
+			}
+			
+			int response = 1;
+			int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
+			if(aaa == 1) {
+				response=2;
+			}
+			
+			return new ResponseEntity<Object>(response, HttpStatus.OK);
+		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public void saveKeys(List<Key> listofKeys, Usuario user) {
 		
