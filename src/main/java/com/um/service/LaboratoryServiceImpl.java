@@ -395,22 +395,34 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		System.out.println("Which Dist Fits Normal" + p);
 	}
 	
-	public void kmeans () throws Exception {
+	public void kmeans (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
+		Attribute attr_a = new Attribute("letter1");
+		Attribute attr_b = new Attribute("letter2");
         Attribute attr1 = new Attribute("P1R1");
         Attribute attr2 = new Attribute(" P1P2");   
         Attribute attr3 = new Attribute("R1P2");   
-        Attribute attr4 = new Attribute("R1R2");   
+        Attribute attr4 = new Attribute("R1R2");
+        Attribute attr5 = new Attribute("User");
+        
         ArrayList<Attribute> attrList = new ArrayList<Attribute>();             
-        attrList.add(attr1);  
+        attrList.add(attr_a);
+        attrList.add(attr_b);
+        attrList.add(attr1);
         attrList.add(attr2);
         attrList.add(attr3);
         attrList.add(attr4);
+        attrList.add(attr5);
         
         Instances dataset = new Instances("test", attrList, 0);
 
         double[] val1 = new double[] { 1.2};
         double[] val2 = new double[] { 2.2};
         double[] val3 = new double[] { 1.4};
+        
+        for(int i=0; i<traindata.size(); i++) {
+        	double[] row = new double[] { traindata.get(i).getPress1_release1(), traindata.get(i).getPress1_press2(), traindata.get(i).getRelease1_press2(), traindata.get(i).getRelease1_release2() };
+        }
+        
 
         Instance instance0 = new DenseInstance(1.0, val1);
         instance0.setDataset(dataset);
