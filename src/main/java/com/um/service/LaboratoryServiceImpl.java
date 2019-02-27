@@ -2,6 +2,7 @@ package com.um.service;
 import java.sql.SQLException;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
 import umontreal.ssj.probdist.*;
+import weka.clusterers.SimpleKMeans;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -387,6 +393,55 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		//NormalDist nd = new NormalDist();
 		NormalDist.getInstanceFromMLE(data, data.length);
 		System.out.println("Which Dist Fits Normal" + p);
+	}
+	
+	public void kmeans () throws Exception {
+        Attribute attr1 = new Attribute("P1R1");
+        Attribute attr2 = new Attribute(" P1P2");   
+        Attribute attr3 = new Attribute("R1P2");   
+        Attribute attr4 = new Attribute("R1R2");   
+        ArrayList<Attribute> attrList = new ArrayList<Attribute>();             
+        attrList.add(attr1);  
+        attrList.add(attr2);
+        attrList.add(attr3);
+        attrList.add(attr4);
+        
+        Instances dataset = new Instances("test", attrList, 0);
+
+        double[] val1 = new double[] { 1.2};
+        double[] val2 = new double[] { 2.2};
+        double[] val3 = new double[] { 1.4};
+
+        Instance instance0 = new DenseInstance(1.0, val1);
+        instance0.setDataset(dataset);
+
+        Instance instance1 = new DenseInstance(1.0, val2);
+        instance1.setDataset(dataset);
+
+        Instance instance2 = new DenseInstance(1.0, val3);
+        instance2.setDataset(dataset);
+
+        dataset.add(instance0);     
+        dataset.add(instance1); 
+        dataset.add(instance2); 
+
+        SimpleKMeans kmeans = new SimpleKMeans();               
+        try {
+            kmeans.setPreserveInstancesOrder(true);
+            kmeans.setNumClusters(2);
+            kmeans.setSeed(2);
+            kmeans.setDontReplaceMissingValues(true);
+            kmeans.buildClusterer(dataset);
+            kmeans.setMaxIterations(10);                                    
+            Instances instances = kmeans.getClusterCentroids();
+            int assignments[] = kmeans.getAssignments();
+            int x=0;
+            for(int assignment : assignments) {
+                System.out.println("data :" + dataset.get(x) + "instance idx: " + x + " centroid value: " + instances.get(assignment));
+                x++;
+            }
+         }
+        finally {}
 	}
 	
 	
