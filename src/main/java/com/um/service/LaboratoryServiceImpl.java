@@ -414,28 +414,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         attrList.add(attr5);
         
         Instances dataset = new Instances("test", attrList, 0);
-
-        double[] val1 = new double[] { 1.2};
-        double[] val2 = new double[] { 2.2};
-        double[] val3 = new double[] { 1.4};
-        
         for(int i=0; i<traindata.size(); i++) {
         	double[] row = new double[] { traindata.get(i).getPress1_release1(), traindata.get(i).getPress1_press2(), traindata.get(i).getRelease1_press2(), traindata.get(i).getRelease1_release2() };
+        	Instance instance0 = new DenseInstance(7.0, row);
+            instance0.setDataset(dataset);
+            dataset.add(instance0);
         }
-        
-
-        Instance instance0 = new DenseInstance(1.0, val1);
-        instance0.setDataset(dataset);
-
-        Instance instance1 = new DenseInstance(1.0, val2);
-        instance1.setDataset(dataset);
-
-        Instance instance2 = new DenseInstance(1.0, val3);
-        instance2.setDataset(dataset);
-
-        dataset.add(instance0);     
-        dataset.add(instance1); 
-        dataset.add(instance2); 
 
         SimpleKMeans kmeans = new SimpleKMeans();               
         try {
