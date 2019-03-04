@@ -27,6 +27,8 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.classifiers.AbstractClassifier;
+import weka.classifiers.meta.OneClassClassifier;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -416,28 +418,13 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         Instances dataset = new Instances("test", attrList, 0);
         for(int i=0; i<traindata.size(); i++) {
         	double[] row = new double[] { traindata.get(i).getPress1_release1(), traindata.get(i).getPress1_press2(), traindata.get(i).getRelease1_press2(), traindata.get(i).getRelease1_release2() };
-        	Instance instance0 = new DenseInstance(7.0, row);
+        	Instance instance0 = new DenseInstance(7, row);
             instance0.setDataset(dataset);
             dataset.add(instance0);
         }
-
-        SimpleKMeans kmeans = new SimpleKMeans();               
-        try {
-            kmeans.setPreserveInstancesOrder(true);
-            kmeans.setNumClusters(2);
-            kmeans.setSeed(2);
-            kmeans.setDontReplaceMissingValues(true);
-            kmeans.buildClusterer(dataset);
-            kmeans.setMaxIterations(10);                                    
-            Instances instances = kmeans.getClusterCentroids();
-            int assignments[] = kmeans.getAssignments();
-            int x=0;
-            for(int assignment : assignments) {
-                System.out.println("data :" + dataset.get(x) + "instance idx: " + x + " centroid value: " + instances.get(assignment));
-                x++;
-            }
-         }
-        finally {}
+        
+        OneClassClassifier oc = new OneClassClassifier();
+        oc.buildClassifier(dataset);
 	}
 	
 	
