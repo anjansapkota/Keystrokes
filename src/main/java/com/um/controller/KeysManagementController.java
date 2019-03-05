@@ -47,7 +47,7 @@ public class KeysManagementController {
 	//reveiving keys to validate the user
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
-	public ResponseEntity<Object> refresh(@RequestBody String json) throws JSONException, ParseException {
+	public ResponseEntity<Object> refresh(@RequestBody String json) throws Exception {
 		//method to validate typing
 		JSONParser parser = new JSONParser();
 		keys = (List<JSONObject>) parser.parse(json);

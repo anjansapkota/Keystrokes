@@ -24,7 +24,7 @@ public interface LaboratoryService {
 
 	Result tTest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 
-	Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name);
+	Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name) throws Exception;
 
 	Result correlationtest(Result ResultTable, Vector<Key> teclaList1, Vector<Key> teclaList2, String Name);
 

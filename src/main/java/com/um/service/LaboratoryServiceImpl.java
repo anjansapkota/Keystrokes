@@ -1,4 +1,5 @@
 package com.um.service;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import java.text.DecimalFormat;
@@ -27,7 +28,9 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.functions.LibSVM;
 import weka.classifiers.meta.OneClassClassifier;
 
 @Service("laboratoryService")
@@ -40,7 +43,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     private static long P1R1  = 500;
     private static long P1P2  = 100;
     private static long R1P2  = 100;
-    private static long R1R2  = 100;   
+    private static long R1R2  = 100;
+    private String name = "";
 	@Override
 	public Vector <Object> bringAllData(Result ResultTable) throws SQLException {
 		Vector <Object> AllData = new Vector <Object>();
@@ -119,7 +123,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     }
 	
 	@Override
-	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) {
+	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) throws Exception {
+		name = Name;
+		classify (persona1Summary, personaPruebaSummary);		
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
@@ -397,37 +403,81 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		System.out.println("Which Dist Fits Normal" + p);
 	}
 	
-	public void kmeans (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
-		Attribute attr_a = new Attribute("letter1");
-		Attribute attr_b = new Attribute("letter2");
-        Attribute attr1 = new Attribute("P1R1");
-        Attribute attr2 = new Attribute(" P1P2");   
-        Attribute attr3 = new Attribute("R1P2");   
-        Attribute attr4 = new Attribute("R1R2");
-        Attribute attr5 = new Attribute("User");
-        
-        ArrayList<Attribute> attrList = new ArrayList<Attribute>();             
-        attrList.add(attr_a);
-        attrList.add(attr_b);
-        attrList.add(attr1);
-        attrList.add(attr2);
-        attrList.add(attr3);
-        attrList.add(attr4);
-        attrList.add(attr5);
-        
-        Instances dataset = new Instances("test", attrList, 0);
-        for(int i=0; i<traindata.size(); i++) {
-        	double[] row = new double[] { traindata.get(i).getPress1_release1(), traindata.get(i).getPress1_press2(), traindata.get(i).getRelease1_press2(), traindata.get(i).getRelease1_release2() };
-        	Instance instance0 = new DenseInstance(7, row);
-            instance0.setDataset(dataset);
-            dataset.add(instance0);
+	public void classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
+		saveTrainARFF(traindata, "Train_" + name);
+		saveTestARFF(testdata, "Test_" + name);
+		DataSource source1 = new DataSource("Train_" + name+".arff");
+        Instances traindataset  = source1.getDataSet();
+        if (traindataset.classIndex() == -1) {
+            System.out.println("reset index...");
+            traindataset.setClassIndex(traindataset.numAttributes() - 1);
         }
+        DataSource source2 = new DataSource("Test_" + name+".arff");
+        Instances testdataset  = source2.getDataSet();
+        
+        LibSVM svm = new LibSVM();
+        svm.buildClassifier(traindataset);
         
         OneClassClassifier oc = new OneClassClassifier();
-        oc.buildClassifier(dataset);
+        oc.buildClassifier(traindataset);
+        Double []classes = new Double[testdataset.size()];
+        for(int i=0; i<testdataset.size(); i++) {
+            Instance instance = testdataset.get(i);
+            classes[i] = svm.classifyInstance(instance);
+        }
 	}
 	
-	
-	
-	
+    public void saveTrainARFF (Vector <Key> vD, String filename){
+        try{
+         
+            PrintWriter fw = new PrintWriter(filename + ".arff");
+                 fw.flush();
+                 fw.println("@RELATION keys");
+                 fw.println("@ATTRIBUTE letter1  STRING");
+                 fw.println("@ATTRIBUTE letter2  STRING");
+                 fw.println("@ATTRIBUTE P1R1  NUMERIC");
+                 fw.println("@ATTRIBUTE P1P2  NUMERIC");
+                 fw.println("@ATTRIBUTE R1P2  NUMERIC");
+                 fw.println("@ATTRIBUTE R1R2  NUMERIC");
+                 fw.println();
+                 fw.println("@ATTRIBUTE class {'" + name + "'}");
+                 
+                 fw.println();
+                 fw.println("@DATA");
+                 
+                 for(int i=0; i<vD.size(); i++){
+            	   Key a = vD.get(i);
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + name);
+                }
+                fw.close();
+        } catch(Exception ex){}finally{
+            
+        }
+        
+    }
+    public void saveTestARFF (Vector <Key> vD, String filename){
+        try{
+         
+            PrintWriter fw = new PrintWriter(filename + ".arff");
+                 fw.flush();
+                 fw.println("@RELATION keys");
+                 fw.println("@ATTRIBUTE letter1  STRING");
+                 fw.println("@ATTRIBUTE letter2  STRING");
+                 fw.println("@ATTRIBUTE P1R1  NUMERIC");
+                 fw.println("@ATTRIBUTE P1P2  NUMERIC");
+                 fw.println("@ATTRIBUTE R1P2  NUMERIC");
+                 fw.println("@ATTRIBUTE R1R2  NUMERIC");
+                 fw.println();
+                 fw.println("@DATA");
+                 
+                 for(int i=0; i<vD.size(); i++){
+            	   Key a = vD.get(i);
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ",?");
+                }
+                fw.close();
+        } catch(Exception ex){}finally{
+            
+        }
+        
+    }
 }
