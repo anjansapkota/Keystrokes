@@ -129,19 +129,19 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
-		HashMap<String, IndividialDigraphsSet> collectionPD = new HashMap<String, IndividialDigraphsSet> ();  //collection_of_paired_diagraphs_of_both_persons
-		Vector<String> digraphsList = new Vector<String>();
+		HashMap<Long, IndividialDigraphsSet> collectionPD = new HashMap<Long, IndividialDigraphsSet> ();  //collection_of_paired_diagraphs_of_both_persons
+		Vector<Long> digraphsList = new Vector<Long>();
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
     	for(int i=1; i<personaPruebaSummary.size(); i++) {                //Prueba is i              //person is j
     		int confirmation = 0;
-    		String l1 = personaPruebaSummary.get(i).getLetter1();
-        	String l2 = personaPruebaSummary.get(i).getLetter2();
+    		long l1 = personaPruebaSummary.get(i).getLetter1();
+    		long l2 = personaPruebaSummary.get(i).getLetter2();
     		for(int j=0; j<persona1Summary.size(); j++) {
-    			  if(persona1Summary.get(j).getLetter1().equals(l1) && persona1Summary.get(j).getLetter2().equals(l2)) {
+    			  if(persona1Summary.get(j).getLetter1() == l1 && persona1Summary.get(j).getLetter2() == l2) {
     				  N_sample++;
     				//no matter the value of any variables, its a set of collections of same recurring digraphs
-    				  String digraph = l1+l2;
+    				  Long digraph = l1+l2;
     				  if(!collectionPD.containsKey(digraph)) {
     					  Vector<Key> tempkeys1 = new Vector <Key> ();
     					  Vector<Key> tempkeys2 = new Vector <Key> ();
@@ -383,15 +383,15 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Override
 	public int checkIfCopyPasted(Vector <Key> listofKeysRecieved) {
 		int a=0;
-		for (int i = 0; i < listofKeysRecieved.size(); i++) {
-			if(!listofKeysRecieved.get(i).getLetter1().equals(null)) {
-				if(listofKeysRecieved.get(i).getLetter1().equals("ctrlv")) {
-				//if(listofKeysRecieved.get(i).getLetter2().equals("v") || listofKeysRecieved.get(i).getLetter2().equals("V")) {
-					a = 1;
-				//}
-				}
-			}
-		}
+//		for (int i = 0; i < listofKeysRecieved.size(); i++) {
+//			if(!listofKeysRecieved.get(i).getLetter1().equals(null)) {
+//				if(listofKeysRecieved.get(i).getLetter1().equals("ctrlv")) {
+//				//if(listofKeysRecieved.get(i).getLetter2().equals("v") || listofKeysRecieved.get(i).getLetter2().equals("V")) {
+//					a = 1;
+//				//}
+//				}
+//			}
+//		}
 		return a;
 	}
 	
@@ -433,8 +433,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             PrintWriter fw = new PrintWriter(filename + ".arff");
                  fw.flush();
                  fw.println("@RELATION keys");
-                 fw.println("@ATTRIBUTE letter1  STRING");
-                 fw.println("@ATTRIBUTE letter2  STRING");
+                 fw.println("@ATTRIBUTE letter1  NUMERIC");
+                 fw.println("@ATTRIBUTE letter2  NUMERIC");
                  fw.println("@ATTRIBUTE P1R1  NUMERIC");
                  fw.println("@ATTRIBUTE P1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");

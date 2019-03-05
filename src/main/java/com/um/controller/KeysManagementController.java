@@ -59,8 +59,8 @@ public class KeysManagementController {
 			Key tempkey = new Key();
 			if(key > 0) {
 				if((long) keys.get(i).get("p1r1") < 25000 && (long) keys.get(i).get("p1p2") < 60000 && (long) keys.get(i).get("r1p2") < 60000 && (long) keys.get(i).get("r1r2") < 60000) {
-					tempkey.setLetter1((String) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
-					tempkey.setLetter2((String) keys.get(i).get("l2"));
+					tempkey.setLetter1((Long) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
+					tempkey.setLetter2((Long) keys.get(i).get("l2"));
 					tempkey.setPress1_press2((long) keys.get(i).get("p1p2"));   //60, 000 max
 					tempkey.setPress1_release1((long) keys.get(i).get("p1r1")); //25, 000 max
 					tempkey.setRelease1_press2((long) keys.get(i).get("r1p2")); //60, 000 max
@@ -109,8 +109,8 @@ public class KeysManagementController {
 				Key tempkey = new Key();
 				if(key > 0) {
 					if((long) keys.get(i).get("p1r1") < 25000 && (long) keys.get(i).get("p1p2") < 60000 && (long) keys.get(i).get("r1p2") < 60000 && (long) keys.get(i).get("r1r2") < 60000) {
-						tempkey.setLetter1((String) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
-						tempkey.setLetter2((String) keys.get(i).get("l2"));
+						tempkey.setLetter1((long) keys.get(i).get("l1"));  //"l1":KM, "l2":KN, "p1r1":A, "p1r1":B, "r1p2":C, "r1r2":D -- this is how it is in javascript in view
+						tempkey.setLetter2((long) keys.get(i).get("l2"));
 						tempkey.setPress1_press2((long) keys.get(i).get("p1p2"));   //60, 000 max
 						tempkey.setPress1_release1((long) keys.get(i).get("p1r1")); //25, 000 max
 						tempkey.setRelease1_press2((long) keys.get(i).get("r1p2")); //60, 000 max

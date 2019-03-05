@@ -3,8 +3,8 @@ package com.um.model;
 public class Key {
 
 private int id;
-private String letter1;
-private String letter2;
+private long letter1;
+private long letter2;
 private long press1_release1;	//the time interval between a key press and the key release.
 private long press1_press2;		//the time interval between a key press and the next key press.
 private long release1_press2;	//the time interval between a key release and the next key press. (-)
@@ -16,16 +16,16 @@ public int getId() {
 public void setId(int id) {
 	this.id = id;
 }
-public String getLetter1() {
+public long getLetter1() {
 	return letter1;
 }
-public void setLetter1(String letter1) {
+public void setLetter1(long letter1) {
 	this.letter1 = letter1;
 }
-public String getLetter2() {
+public long getLetter2() {
 	return letter2;
 }
-public void setLetter2(String letter2) {
+public void setLetter2(long letter2) {
 	this.letter2 = letter2;
 }
 public long getPress1_release1() {

@@ -84,8 +84,8 @@ public class KMImpl implements KmService {
 				while (rs.next()) {
 			    	Key temp = new Key();
 			    	temp.setId(rs.getInt("ID"));
-			    	temp.setLetter1(rs.getString("letter1"));
-			    	temp.setLetter2(rs.getString("letter2"));
+			    	temp.setLetter1(rs.getLong("letter1"));
+			    	temp.setLetter2(rs.getLong("letter2"));
 			    	temp.setPress1_release1(rs.getLong("press1_release1"));
 			    	temp.setPress1_press2(rs.getLong("press1_press2"));
 			    	temp.setRelease1_press2(rs.getLong("release1_press2"));
@@ -109,7 +109,7 @@ public class KMImpl implements KmService {
 			int b = 0;
 			if(i+1 < retrieveKeysFromDB.size()) {
 				Key temp2 = retrieveKeysFromDB.get(i+1);
-				if(temp1.getLetter1().equals(temp2.getLetter1()) && temp1.getLetter2().equals(temp2.getLetter2()) && temp1.getPress1_press2()== temp2.getPress1_press2()) {
+				if(temp1.getLetter1()==(temp2.getLetter1()) && temp1.getLetter2() == (temp2.getLetter2()) && temp1.getPress1_press2()== temp2.getPress1_press2()) {
 					Object[] parametros = new Object[]{temp2.getId()};
 					a = postgresTemplate.update(query, parametros);
 					count = count+a;

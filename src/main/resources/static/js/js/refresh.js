@@ -5,7 +5,7 @@ window.addEventListener("keydown", keydown, false);
 window.addEventListener("keypress", kp, false);
 window.addEventListener("keyup", keyup, false);
 var KM;
-var KN;
+var KN= 0;
 var X;
 var Y;
 var A;
@@ -21,50 +21,17 @@ function keydown(e) {
 	X = n;
 	
 	KM=KN;
-	if(e.ctrlKey){
-		KN = "ctrl";
-	}else if(e.altKey){
-		KN = "alt";
-	}else if(e.shiftKey){
-		KN = "shift";
-	}else if(e.keyCode==8){
-		KN = "backspace";
-	}
-	else if(e.keyCode==46){
-		KN = "del";
-	}
-	else if(e.keyCode==32){
-		KN = "space";
-	}
-	else if(e.keyCode==20){
-		KN = "capslock";
-	}
-	else if(e.keyCode==37){
-		KN = "leftarrow";
-	}
-	else if(e.keyCode==39){
-		KN = "rightarrow";
-	}
-	else if(e.keyCode==38){
-		KN = "uparrow";
-	}
-	else if(e.keyCode==40){
-		KN = "downarrow";
-	}
-	else if(e.keyCode==13){
-		KN = "enter";
-	}
-	
 	if(e.ctrlKey && e.keyCode==86){
-		KN = "ctrlv";
+		KN = 999999999;
 	}
 }
 
 function kp(e) {
-	if(!e.ctrlKey && !e.altKey && !e.shiftKey && !e.backspaceKey && e.keyCode!=46 && e.keyCode!=32 && e.keyCode!=20 && e.keyCode!=37 && e.keyCode!=38 && e.keyCode!=39 && e.keyCode!=40 && e.keyCode!=13){
-		KN = String.fromCharCode(e.which);
+	if(!e.ctrlKey && e.keyCode!=86){
+	KN = e.keyCode;
+	console.log(KM)
+	console.log(KN)
 	}
-	
 }
 
 function keyup(e) {
