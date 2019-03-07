@@ -28,6 +28,8 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.SelectedTag;
+import weka.core.Tag;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.functions.LibSVM;
@@ -414,16 +416,55 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         }
         DataSource source2 = new DataSource("Test_" + name+".arff");
         Instances testdataset  = source2.getDataSet();
-        
+        if (testdataset.classIndex() == -1) {
+            System.out.println("reset index...");
+            testdataset.setClassIndex(testdataset.numAttributes() - 1);
+        }
         LibSVM svm = new LibSVM();
+        svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
         svm.buildClassifier(traindataset);
-        
-        OneClassClassifier oc = new OneClassClassifier();
-        oc.buildClassifier(traindataset);
+//        OneClassClassifier oc = new OneClassClassifier();
+//        oc.buildClassifier(traindataset);
         Double []classes = new Double[testdataset.size()];
-        for(int i=0; i<testdataset.size(); i++) {
-            Instance instance = testdataset.get(i);
-            classes[i] = svm.classifyInstance(instance);
+//        for(int i=0; i<testdataset.size(); i++) {
+//            Instance instance = testdataset.get(i);
+//            classes[i] = svm.classifyInstance(instance);
+//        }
+        
+        ArrayList<Attribute> atts = new ArrayList<Attribute>(5);
+
+			atts.add(new Attribute("letter1"));
+			atts.add(new Attribute("letter2"));
+			atts.add(new Attribute("P1R1"));
+			atts.add(new Attribute("P1P2"));
+			atts.add(new Attribute("R1P2"));
+			atts.add(new Attribute("R1R2"));
+			Instances dataRaw = new Instances("TestInstances", atts, 5);
+			
+			
+			for(Key row:testdata) {
+				double[] raw = new double[6];
+					raw[0] = row.getLetter1();
+					raw[1] = row.getLetter2();
+					raw[2] = row.getPress1_press2();
+					raw[3] = row.getPress1_release1();
+					raw[4] = row.getRelease1_press2();
+					raw[5] = row.getRelease1_release2();
+				dataRaw.add(new DenseInstance(1.0, raw));
+	        }
+			
+			for(int i=0; i<dataRaw.size(); i++) {
+				 Instance instance = dataRaw.get(i);
+				 instance.setClassMissing();
+				 classes[i] = svm.classifyInstance(instance);
+	        }
+			
+		
+		
+		
+		//Print results of classification
+        for(Double i:classes) {
+        	System.out.println("Class is " + i);
         }
 	}
 	
@@ -461,8 +502,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             PrintWriter fw = new PrintWriter(filename + ".arff");
                  fw.flush();
                  fw.println("@RELATION keys");
-                 fw.println("@ATTRIBUTE letter1  STRING");
-                 fw.println("@ATTRIBUTE letter2  STRING");
+                 fw.println("@ATTRIBUTE letter1  NUMERIC");
+                 fw.println("@ATTRIBUTE letter2  NUMERIC");
                  fw.println("@ATTRIBUTE P1R1  NUMERIC");
                  fw.println("@ATTRIBUTE P1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");
@@ -472,7 +513,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  
                  for(int i=0; i<vD.size(); i++){
             	   Key a = vD.get(i);
-            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ",?");
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2());
                 }
                 fw.close();
         } catch(Exception ex){}finally{
@@ -480,4 +521,22 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         }
         
     }
+    
+	public void saveModelToFile(String filename, LibSVM svm) {
+		try {
+			weka.core.SerializationHelper.write(filename, svm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public LibSVM loadModelFromFile(String filename) {
+		LibSVM model = new LibSVM();
+		try {
+			model = (LibSVM) weka.core.SerializationHelper.read(filename);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
+	}
 }
