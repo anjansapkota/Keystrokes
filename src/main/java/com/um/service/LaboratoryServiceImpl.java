@@ -32,6 +32,7 @@ import weka.core.SelectedTag;
 import weka.core.Tag;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.meta.OneClassClassifier;
 
@@ -420,9 +421,30 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             System.out.println("reset index...");
             testdataset.setClassIndex(testdataset.numAttributes() - 1);
         }
+        
+//        double percent = 0.50;
+//        int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
+//        int testingSize = traindataset.numInstances() - trainingSize;
+//        Instances training = new Instances(traindataset, 0, trainingSize);
+//        if (training.classIndex() == -1) {
+//            System.out.println("reset index...");
+//            training.setClassIndex(training.numAttributes() - 1);
+//        }
+//        Instances learning = new Instances(traindataset, trainingSize, testingSize);
+//        if (learning.classIndex() == -1) {
+//            System.out.println("reset index...");
+//            learning.setClassIndex(learning.numAttributes() - 1);
+//        }
+        
         LibSVM svm = new LibSVM();
         svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
         svm.buildClassifier(traindataset);
+//        Evaluation eval = new Evaluation(training);
+//        eval.evaluateModel(svm, learning);
+     // print the results of modeling
+//        String strSummary = eval.toSummaryString();
+//        System.out.println("" + strSummary);
+        
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
         Double []classes = new Double[testdataset.size()];
@@ -439,7 +461,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			atts.add(new Attribute("P1P2"));
 			atts.add(new Attribute("R1P2"));
 			atts.add(new Attribute("R1R2"));
-			Instances dataRaw = new Instances("TestInstances", atts, 5);
+			atts.add(new Attribute(name));
+			Instances dataRaw = new Instances("TestInstances", atts, 6);
 			
 			
 			for(Key row:testdata) {
@@ -452,16 +475,15 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 					raw[5] = row.getRelease1_release2();
 				dataRaw.add(new DenseInstance(1.0, raw));
 	        }
+			if (dataRaw.classIndex() == -1) {
+	            System.out.println("reset index...");
+	            dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
+	        }
 			
 			for(int i=0; i<dataRaw.size(); i++) {
 				 Instance instance = dataRaw.get(i);
-				 instance.setClassMissing();
 				 classes[i] = svm.classifyInstance(instance);
 	        }
-			
-		
-		
-		
 		//Print results of classification
         for(Double i:classes) {
         	System.out.println("Class is " + i);
@@ -469,8 +491,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	}
 	
     public void saveTrainARFF (Vector <Key> vD, String filename){
-        try{
-         
+        try{         
             PrintWriter fw = new PrintWriter(filename + ".arff");
                  fw.flush();
                  fw.println("@RELATION keys");
@@ -509,11 +530,13 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1R2  NUMERIC");
                  fw.println();
+                 fw.println("@ATTRIBUTE class {'" + name + "'}");
+                 fw.println();
                  fw.println("@DATA");
                  
                  for(int i=0; i<vD.size(); i++){
             	   Key a = vD.get(i);
-            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2());
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ", ?");
                 }
                 fw.close();
         } catch(Exception ex){}finally{
