@@ -31,6 +31,8 @@ import weka.core.Instances;
 import weka.core.SelectedTag;
 import weka.core.Tag;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Normalize;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
@@ -196,7 +198,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     			}
     		  
     		}   	
-    	
+    	double nr = 0;
     	ResultTable.setMatchesResult(matchcount);
     	double[] normality_results = new double[digraphsList.size()];
     	if(teclasIgualespersonaPrueba.size() > 3) {    		
@@ -206,10 +208,14 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         	}
         	ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
         	ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
-        	System.out.println("The possiblity of matching this user is "+ Mean(normality_results));
-        	System.out.println("Matchcount = "+ matchcount  + " Total Sample = "+ N_sample + " Total Sample is " + (N_sample*4));
-        	System.out.println("The possiblity through match count is  "+ matchcount/(N_sample*4));
-    	}    	
+        	nr = Mean(normality_results);
+        	System.out.println("The possiblity of matching this user through pdf is  "+ nr);
+        	System.out.println("Matchcount = "+ matchcount  + " Total Sample = "+ N_sample);
+    	}
+    	Double score = nr + ResultTable.getCorrelationTestResult().getA() + ResultTable.getCorrelationTestResult().getB() + + ResultTable.getCorrelationTestResult().getC()+ ResultTable.getCorrelationTestResult().getD();
+    	score = score/5;
+    	ResultTable.setScore(score);
+    	System.out.println("The final possiblity of matching this user is "+ score);
     	return ResultTable;
     }
 	
@@ -292,7 +298,11 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		NormalDistribution normaldist = new NormalDistribution(mean, sd);
 		
 		DecimalFormat df = new DecimalFormat("#.00000");
-		aa = normaldist.cumulativeProbability(lowerbound,upperbound);
+		if(lowerbound == upperbound) {
+			aa = normaldist.cumulativeProbability(lowerbound);
+		} else {
+			aa = normaldist.cumulativeProbability(lowerbound,upperbound);
+			}
 		//= Double.parseDouble(df.format(normaldist.sample()));
 		
 		aa= Double.parseDouble(df.format(aa));
@@ -401,7 +411,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	public void whichDistFits(double[] data) {
 		double p=0;
-		//NormalDist nd = new NormalDist();
+		NormalDist nd = new NormalDist();
 		NormalDist.getInstanceFromMLE(data, data.length);
 		System.out.println("Which Dist Fits Normal" + p);
 	}
@@ -422,28 +432,33 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             testdataset.setClassIndex(testdataset.numAttributes() - 1);
         }
         
-//        double percent = 0.50;
-//        int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
-//        int testingSize = traindataset.numInstances() - trainingSize;
-//        Instances training = new Instances(traindataset, 0, trainingSize);
-//        if (training.classIndex() == -1) {
-//            System.out.println("reset index...");
-//            training.setClassIndex(training.numAttributes() - 1);
-//        }
-//        Instances learning = new Instances(traindataset, trainingSize, testingSize);
-//        if (learning.classIndex() == -1) {
-//            System.out.println("reset index...");
-//            learning.setClassIndex(learning.numAttributes() - 1);
-//        }
-        
+        double percent = 0.50;
+        int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
+        int testingSize = traindataset.numInstances() - trainingSize;
+        Instances training = new Instances(traindataset, 0, trainingSize);
+        if (training.classIndex() == -1) {
+            System.out.println("reset index...");
+            training.setClassIndex(training.numAttributes() - 1);
+        }
+        Instances learning = new Instances(traindataset, trainingSize, testingSize);
+        if (learning.classIndex() == -1) {
+            System.out.println("reset index...");
+            learning.setClassIndex(learning.numAttributes() - 1);
+        }
+        Normalize filterNormtrain = new Normalize();
+        filterNormtrain.setInputFormat(training);
+        training = Filter.useFilter(training, filterNormtrain);
+        Normalize filterNormlearning = new Normalize();
+        filterNormlearning.setInputFormat(learning);
+        learning = Filter.useFilter(learning, filterNormlearning);
         LibSVM svm = new LibSVM();
         svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
-        svm.buildClassifier(traindataset);
-//        Evaluation eval = new Evaluation(training);
-//        eval.evaluateModel(svm, learning);
-     // print the results of modeling
-//        String strSummary = eval.toSummaryString();
-//        System.out.println("" + strSummary);
+        svm.buildClassifier(training);
+        Evaluation eval = new Evaluation(training);
+        eval.evaluateModel(svm, learning);
+        //print the results of modeling
+        String strSummary = eval.toSummaryString();
+        System.out.println("" + strSummary);
         
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
@@ -479,10 +494,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	            System.out.println("reset index...");
 	            dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
 	        }
-			
 			for(int i=0; i<dataRaw.size(); i++) {
 				 Instance instance = dataRaw.get(i);
-				 classes[i] = svm.classifyInstance(instance);
+				 classes[i] = svm.classifyInstance(instance); //
 	        }
 		//Print results of classification
         for(Double i:classes) {

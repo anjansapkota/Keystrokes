@@ -100,12 +100,6 @@
 			<artifactId>ssj</artifactId>
 			<version>3.3.1</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
-		<dependency>
-			<groupId>nz.ac.waikato.cms.weka</groupId>
-			<artifactId>alternatingDecisionTrees</artifactId>
-			<version>1.0.5</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/oneClassClassifier -->
 		<dependency>
 		    <groupId>nz.ac.waikato.cms.weka</groupId>

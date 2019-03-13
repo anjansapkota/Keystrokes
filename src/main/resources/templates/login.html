@@ -81,7 +81,16 @@
 			</div>
 		</div>
 	</div>
-	
+	<span th:if="${userRegistertionProblem}== no">
+		<script th:inline="javascript">
+		swal("", {
+			  title: "Signed Up Successfully! Now Log In and Complete Registration",
+			  icon: "success",
+			  buttons:false,
+			  timer:2000,
+		});	
+		</script>
+		</span>
 	
 <!--===============================================================================================-->
 	<script th:src="@{vendor/jquery/jquery-3.2.1.min.js}"></script>

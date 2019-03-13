@@ -70,7 +70,7 @@ public class KeysManagementController {
 			}
 			key = 1;
 		}
-		
+		Result ResultTable = new Result();
 		if(listofKeysRecieved.size()%100<9) {			//to test every 100 keys
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
@@ -81,16 +81,20 @@ public class KeysManagementController {
 			e.printStackTrace();
 		}
 
-		Result ResultTable = new Result();
+		
 		ResultTable = lbs.checkMatches(ResultTable,listofKeysExpectedUser, listofKeysRecieved, matriculaEnTexto);
 		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
 		}
 		int response = 1;
-		int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
-		if(aaa == 1) {
+		if(ResultTable.getScore() < 0.40) {
 			response=2;
 		}
 		
+		if(ResultTable.getScore() < 0.70) {
+			auth = SecurityContextHolder.getContext().getAuthentication();
+			String matriculaEnTexto = auth.getName();
+			kmService.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
+		}
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 	
@@ -129,31 +133,7 @@ public class KeysManagementController {
 			
 			return new ResponseEntity<Object>(response, HttpStatus.OK);
 		}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public void saveKeys(List<Key> listofKeys, Usuario user) {
 		
 	}
