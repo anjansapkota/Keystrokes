@@ -45,10 +45,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
 	 UsuarioService us;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
-    private static long P1R1  = 500;
-    private static long P1P2  = 100;
-    private static long R1P2  = 100;
-    private static long R1R2  = 100;
+    private static long P1R1  = 800;
+    private static long P1P2  = 800;
+    private static long R1P2  = 800;
+    private static long R1R2  = 800;
     private String name = "";
 	@Override
 	public Vector <Object> bringAllData(Result ResultTable) throws SQLException {
@@ -130,7 +130,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Override
 	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) throws Exception {
 		name = Name;
-		classify (persona1Summary, personaPruebaSummary);		
+		//classify (persona1Summary, personaPruebaSummary);		
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
@@ -199,6 +199,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     		  
     		}   	
     	double nr = 0;
+    	double score = 0;
     	ResultTable.setMatchesResult(matchcount);
     	double[] normality_results = new double[digraphsList.size()];
     	if(teclasIgualespersonaPrueba.size() > 3) {    		
@@ -210,12 +211,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         	ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
         	nr = Mean(normality_results);
         	System.out.println("The possiblity of matching this user through pdf is  "+ nr);
-        	System.out.println("Matchcount = "+ matchcount  + " Total Sample = "+ N_sample);
+        	System.out.println("Matchcount = "+ matchcount  + " Total Sample = "+ N_sample*4);
+        	score = nr + ResultTable.getCorrelationTestResult().getA() + ResultTable.getCorrelationTestResult().getB() + + ResultTable.getCorrelationTestResult().getC()+ ResultTable.getCorrelationTestResult().getD();
+        	
     	}
-    	Double score = nr + ResultTable.getCorrelationTestResult().getA() + ResultTable.getCorrelationTestResult().getB() + + ResultTable.getCorrelationTestResult().getC()+ ResultTable.getCorrelationTestResult().getD();
     	score = score/5;
-    	ResultTable.setScore(score);
-    	System.out.println("The final possiblity of matching this user is "+ score);
+    	ResultTable.setScore(score);    	
     	return ResultTable;
     }
 	
@@ -304,7 +305,6 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			aa = normaldist.cumulativeProbability(lowerbound,upperbound);
 			}
 		//= Double.parseDouble(df.format(normaldist.sample()));
-		
 		aa= Double.parseDouble(df.format(aa));
 		whichDistFits(sample);
 		return aa;
@@ -494,7 +494,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	            System.out.println("reset index...");
 	            dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
 	        }
-			for(int i=0; i<dataRaw.size(); i++) {
+			for(int i=0; i<dataRaw.size()-1; i++) {
 				 Instance instance = dataRaw.get(i);
 				 classes[i] = svm.classifyInstance(instance); //
 	        }

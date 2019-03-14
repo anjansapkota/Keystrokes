@@ -43,7 +43,7 @@ public class KeysManagementController {
 	HashMap<String, Result> ResultTable = new HashMap<String, Result>();
 	private Authentication auth;	
 	private int key = 0; //to avoid error 500 for refresh because it finds a keystroke with null letter1
-	
+	String matriculaEnTexto;
 	//reveiving keys to validate the user
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
@@ -54,6 +54,8 @@ public class KeysManagementController {
 		if(keys.size()<=7) {
 			listofKeysRecieved= new Vector<Key>();
 			ResultTable = new HashMap<String, Result>();
+			auth = SecurityContextHolder.getContext().getAuthentication();
+			matriculaEnTexto = auth.getName();
 		}
 		for (int i = 0; i < keys.size(); i++) {					//converting json array to model.key array
 			Key tempkey = new Key();
@@ -70,30 +72,29 @@ public class KeysManagementController {
 			}
 			key = 1;
 		}
+		int response = 1;
 		Result ResultTable = new Result();
-		if(listofKeysRecieved.size()%100<9) {			//to test every 100 keys
-		auth = SecurityContextHolder.getContext().getAuthentication();
-		String matriculaEnTexto = auth.getName();
+		if(listofKeysRecieved.size()%100<9) {			//to test every 100 keys		
 		try {
 			listofKeysExpectedUser = kmService.retrieveKeysFromDB(matriculaEnTexto);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
 		ResultTable = lbs.checkMatches(ResultTable,listofKeysExpectedUser, listofKeysRecieved, matriculaEnTexto);
 		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
+		System.out.println("The final possiblity of matching this user is "+ ResultTable.getScore() * 100 + "%.");
+		if(listofKeysRecieved.size() > 100) {
+			if(ResultTable.getScore() < 0.25) {
+				response=2;
+			}			
+			if(ResultTable.getScore() > 0.70) {
+				int a = kmService.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
+				if(a == 1) {
+					System.out.println("Good Matching Saved new keys to DB"); 
+				}
+			}
 		}
-		int response = 1;
-		if(ResultTable.getScore() < 0.40) {
-			response=2;
-		}
-		
-		if(ResultTable.getScore() < 0.70) {
-			auth = SecurityContextHolder.getContext().getAuthentication();
-			String matriculaEnTexto = auth.getName();
-			kmService.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
 		}
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
@@ -126,10 +127,10 @@ public class KeysManagementController {
 			}
 			
 			int response = 1;
-			int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
-			if(aaa == 1) {
-				response=2;
-			}
+			//int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
+			//if(aaa == 1) {
+				//response=2;
+			//}
 			
 			return new ResponseEntity<Object>(response, HttpStatus.OK);
 		}

@@ -76,7 +76,7 @@ function ajaxFire(list) {
 					success : function(result) {
 						if(result ==2){
 							swal("", {
-								  title: "Copy Paste Detected! Your answer will not be received by the System!",
+								  title: "You dont seem like the real user! You exam shall be cancelled",
 								  icon: "error",
 								  buttons:false,
 								  timer:5000

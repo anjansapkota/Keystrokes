@@ -4,7 +4,7 @@ public class Result {
 	private T_Test tTestResult;
 	private Corelation CorrelationTestResult;
 	private int matchesResult;
-	private Double score;
+	private double score;
 	
 	public T_Test gettTestResult() {
 		return tTestResult;
@@ -24,10 +24,10 @@ public class Result {
 	public void setMatchesResult(int matchesResult) {
 		this.matchesResult = matchesResult;
 	}
-	public Double getScore() {
+	public double getScore() {
 		return score;
 	}
-	public void setScore(Double score) {
+	public void setScore(double score) {
 		this.score = score;
 	}
 }
