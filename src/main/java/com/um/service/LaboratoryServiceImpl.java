@@ -130,7 +130,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Override
 	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) throws Exception {
 		name = Name;
-		//classify (persona1Summary, personaPruebaSummary);		
+		classify (persona1Summary, personaPruebaSummary);		
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
@@ -306,7 +306,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			}
 		//= Double.parseDouble(df.format(normaldist.sample()));
 		aa= Double.parseDouble(df.format(aa));
-		whichDistFits(sample);
+		//whichDistFits(sample);
 		return aa;
 	}
 	
@@ -410,10 +410,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	
 	public void whichDistFits(double[] data) {
-		double p=0;
-		NormalDist nd = new NormalDist();
 		NormalDist.getInstanceFromMLE(data, data.length);
-		System.out.println("Which Dist Fits Normal" + p);
 	}
 	
 	public void classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
@@ -434,13 +431,13 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         
         double percent = 0.50;
         int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
-        int testingSize = traindataset.numInstances() - trainingSize;
+        int learningSize = traindataset.numInstances() - trainingSize;
         Instances training = new Instances(traindataset, 0, trainingSize);
         if (training.classIndex() == -1) {
             System.out.println("reset index...");
             training.setClassIndex(training.numAttributes() - 1);
         }
-        Instances learning = new Instances(traindataset, trainingSize, testingSize);
+        Instances learning = new Instances(traindataset, trainingSize, learningSize);
         if (learning.classIndex() == -1) {
             System.out.println("reset index...");
             learning.setClassIndex(learning.numAttributes() - 1);
@@ -462,12 +459,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
-        Double []classes = new Double[testdataset.size()];
-//        for(int i=0; i<testdataset.size(); i++) {
-//            Instance instance = testdataset.get(i);
-//            classes[i] = svm.classifyInstance(instance);
-//        }
-        
+        double []classes = new double[testdataset.size()];       
         ArrayList<Attribute> atts = new ArrayList<Attribute>(5);
 
 			atts.add(new Attribute("letter1"));
@@ -488,20 +480,25 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 					raw[3] = row.getPress1_release1();
 					raw[4] = row.getRelease1_press2();
 					raw[5] = row.getRelease1_release2();
-				dataRaw.add(new DenseInstance(1.0, raw));
+				dataRaw.add(new DenseInstance(6, raw));
 	        }
+			
 			if (dataRaw.classIndex() == -1) {
 	            System.out.println("reset index...");
 	            dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
 	        }
+//			Normalize filterNormdataRaw = new Normalize();
+//	        filterNormdataRaw.setInputFormat(dataRaw);
+//	        dataRaw = Filter.useFilter(dataRaw, filterNormdataRaw);
 			for(int i=0; i<dataRaw.size()-1; i++) {
-				 Instance instance = dataRaw.get(i);
+				 Instance instance = dataRaw.get(i);				 
 				 classes[i] = svm.classifyInstance(instance); //
+				 System.out.println(", predicted: " + training.classAttribute().value((int) classes[i]));
 	        }
 		//Print results of classification
-        for(Double i:classes) {
-        	System.out.println("Class is " + i);
-        }
+//        for(Double i:classes) {
+//        	System.out.println("Class is " + i);
+//        }
 	}
 	
     public void saveTrainARFF (Vector <Key> vD, String filename){
