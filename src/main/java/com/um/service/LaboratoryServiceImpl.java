@@ -32,7 +32,12 @@ import weka.core.SelectedTag;
 import weka.core.Tag;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.Normalize;
+import weka.filters.unsupervised.attribute.Remove;
+import weka.attributeSelection.AttributeSelection;
+import weka.attributeSelection.InfoGainAttributeEval;
+import weka.attributeSelection.Ranker;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
@@ -429,17 +434,38 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             testdataset.setClassIndex(testdataset.numAttributes() - 1);
         }
         
+        ArrayList<Attribute> atts = new ArrayList<Attribute>(5);
+
+		atts.add(new Attribute("letter1"));
+		atts.add(new Attribute("letter2"));
+		atts.add(new Attribute("P1R1"));
+		atts.add(new Attribute("P1P2"));
+		atts.add(new Attribute("R1P2"));
+		atts.add(new Attribute("R1R2"));
+		atts.add(new Attribute(name));
+
+        Remove removeFilter = new Remove();
+        removeFilter.setAttributeIndices("1,2,3,4,5,6");;
+        removeFilter.setInvertSelection(true);
+        removeFilter.setInputFormat(testdataset);
+        testdataset = Filter.useFilter(testdataset, removeFilter);
+        Normalize filterNormtest = new Normalize();
+        filterNormtest.setInputFormat(testdataset);
+        testdataset = Filter.useFilter(testdataset, filterNormtest);
+        Add filter = new Add();
+        filter.setAttributeIndex("last");
+        filter.setAttributeName(name);
+        filter.setInputFormat(testdataset);
+        testdataset = Filter.useFilter(testdataset, filter);
         double percent = 0.50;
         int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
         int learningSize = traindataset.numInstances() - trainingSize;
         Instances training = new Instances(traindataset, 0, trainingSize);
         if (training.classIndex() == -1) {
-            System.out.println("reset index...");
             training.setClassIndex(training.numAttributes() - 1);
         }
         Instances learning = new Instances(traindataset, trainingSize, learningSize);
         if (learning.classIndex() == -1) {
-            System.out.println("reset index...");
             learning.setClassIndex(learning.numAttributes() - 1);
         }
         Normalize filterNormtrain = new Normalize();
@@ -456,20 +482,11 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         //print the results of modeling
         String strSummary = eval.toSummaryString();
         System.out.println("" + strSummary);
-        
+        saveModelToFile(name, svm);
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
-        double []classes = new double[testdataset.size()];       
-        ArrayList<Attribute> atts = new ArrayList<Attribute>(5);
-
-			atts.add(new Attribute("letter1"));
-			atts.add(new Attribute("letter2"));
-			atts.add(new Attribute("P1R1"));
-			atts.add(new Attribute("P1P2"));
-			atts.add(new Attribute("R1P2"));
-			atts.add(new Attribute("R1R2"));
-			atts.add(new Attribute(name));
-			Instances dataRaw = new Instances("TestInstances", atts, 6);
+        double []classes = new double[testdataset.size()];
+		Instances dataRaw = new Instances("TestInstances", atts, 6);
 			
 			
 			for(Key row:testdata) {
@@ -483,15 +500,14 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				dataRaw.add(new DenseInstance(6, raw));
 	        }
 			
-			if (dataRaw.classIndex() == -1) {
-	            System.out.println("reset index...");
-	            dataRaw.setClassIndex(dataRaw.numAttributes() - 1);
+			if (testdataset.classIndex() == -1) {
+	            testdataset.setClassIndex(testdataset.numAttributes() - 1);
 	        }
 //			Normalize filterNormdataRaw = new Normalize();
 //	        filterNormdataRaw.setInputFormat(dataRaw);
 //	        dataRaw = Filter.useFilter(dataRaw, filterNormdataRaw);
-			for(int i=0; i<dataRaw.size()-1; i++) {
-				 Instance instance = dataRaw.get(i);				 
+			for(int i=0; i<testdataset.size()-1; i++) {
+				 Instance instance = testdataset.get(i);				 
 				 classes[i] = svm.classifyInstance(instance); //
 				 System.out.println(", predicted: " + training.classAttribute().value((int) classes[i]));
 	        }
@@ -547,7 +563,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  
                  for(int i=0; i<vD.size(); i++){
             	   Key a = vD.get(i);
-            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ", ?");
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + name);
                 }
                 fw.close();
         } catch(Exception ex){}finally{
@@ -558,7 +574,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     
 	public void saveModelToFile(String filename, LibSVM svm) {
 		try {
-			weka.core.SerializationHelper.write(filename, svm);
+			weka.core.SerializationHelper.write(filename+"_model.txt", svm);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
