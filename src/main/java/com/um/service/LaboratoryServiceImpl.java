@@ -21,27 +21,18 @@ import org.apache.commons.math3.stat.inference.TTest;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-
-import umontreal.ssj.probdist.*;
-import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
-import weka.core.Tag;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
-import weka.attributeSelection.AttributeSelection;
-import weka.attributeSelection.InfoGainAttributeEval;
-import weka.attributeSelection.Ranker;
-import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
-import weka.classifiers.meta.OneClassClassifier;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -414,9 +405,6 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	}
 	
 	
-	public void whichDistFits(double[] data) {
-		NormalDist.getInstanceFromMLE(data, data.length);
-	}
 	
 	public void classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
 		saveTrainARFF(traindata, "Train_" + name);

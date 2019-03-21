@@ -95,24 +95,12 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>ca.umontreal.iro.simul</groupId>
-			<artifactId>ssj</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/oneClassClassifier -->
-		<dependency>
-		    <groupId>nz.ac.waikato.cms.weka</groupId>
-		    <artifactId>oneClassClassifier</artifactId>
-		    <version>1.0.2</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/LibSVM -->
 		<dependency>
 		    <groupId>nz.ac.waikato.cms.weka</groupId>
 		    <artifactId>LibSVM</artifactId>
 		    <version>1.0.10</version>
-		</dependency>
-		
+		</dependency>		
 	</dependencies>
 
 	<build>
