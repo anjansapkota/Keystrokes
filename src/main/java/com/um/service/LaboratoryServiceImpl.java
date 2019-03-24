@@ -130,8 +130,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	@Override
 	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) throws Exception {
-		name = Name;
-		classify (persona1Summary, personaPruebaSummary);		
+		name = Name;				
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
@@ -197,8 +196,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     					}    					
     			  	}
     			}
-    		  
-    		}   	
+    		}
+    	classify (teclasIgualesPersona1, teclasIgualespersonaPrueba);
     	double nr = 0;
     	double score = 0;
     	ResultTable.setMatchesResult(matchcount);
@@ -422,10 +421,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         }
         DataSource source2 = new DataSource("Test_" + name+".arff");
         Instances testdataset  = source2.getDataSet();
-        if (testdataset.classIndex() == -1) {
-            System.out.println("reset index...");
-            testdataset.setClassIndex(testdataset.numAttributes() - 1);
-        }
+//        if (testdataset.classIndex() == -1) {
+//            System.out.println("reset index...");
+//            testdataset.setClassIndex(testdataset.numAttributes() - 1);
+//        }
         
         ArrayList<Attribute> atts = new ArrayList<Attribute>(5);
 
@@ -437,19 +436,19 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		atts.add(new Attribute("R1R2"));
 		atts.add(new Attribute(name));
 
-        Remove removeFilter = new Remove();
-        removeFilter.setAttributeIndices("1,2,3,4,5,6");;
-        removeFilter.setInvertSelection(true);
-        removeFilter.setInputFormat(testdataset);
-        testdataset = Filter.useFilter(testdataset, removeFilter);
+//        Remove removeFilter = new Remove();
+//        removeFilter.setAttributeIndices("1,2,3,4,5,6");;
+//        removeFilter.setInvertSelection(true);
+//        removeFilter.setInputFormat(testdataset);
+//        testdataset = Filter.useFilter(testdataset, removeFilter);
         Normalize filterNormtest = new Normalize();
         filterNormtest.setInputFormat(testdataset);
         testdataset = Filter.useFilter(testdataset, filterNormtest);
-        Add filter = new Add();
-        filter.setAttributeIndex("last");
-        filter.setAttributeName(name);
-        filter.setInputFormat(testdataset);
-        testdataset = Filter.useFilter(testdataset, filter);
+//        Add filter = new Add();
+//        filter.setAttributeIndex("last");
+//        filter.setAttributeName(name);
+//        filter.setInputFormat(testdataset);
+//        testdataset = Filter.useFilter(testdataset, filter);
         
         double percent = 0.50;
         int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
@@ -493,9 +492,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		 * row.getRelease1_release2(); dataRaw.add(new DenseInstance(6, raw)); }
 		 */
 			
-			//if (testdataset.classIndex() == -1) {
-	          //  testdataset.setClassIndex(testdataset.numAttributes() - 1);
-	        //}
+			if (testdataset.classIndex() == -1) {
+	            testdataset.setClassIndex(testdataset.numAttributes() - 1);
+	        }
 //			Normalize filterNormdataRaw = new Normalize();
 //	        filterNormdataRaw.setInputFormat(dataRaw);
 //	        dataRaw = Filter.useFilter(dataRaw, filterNormdataRaw);
@@ -503,10 +502,17 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				 Instance instance = testdataset.get(i);
 				 instance.setClassMissing();
 				 classes.add(classifier.classifyInstance(instance)); //
-				 if(classes.size() < i ) {
 				 System.out.println(", predicted: " + training.classAttribute().value(classes.get(i).intValue()));
-				 }
-	        }
+		}
+		int yes = 0;
+		int no = 0;
+			for(int i = 0; i<classes.size(); i++) {
+				if(classes.get(i)==0) {
+					yes++;
+				} else no++;
+			}
+		double Possibility = yes/classes.size();	
+		System.out.println("Possiblity by classification is" + Possibility);	
 		//Print results of classification
 //        for(Double i:classes) {
 //        	System.out.println("Class is " + i);
@@ -526,7 +532,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1R2  NUMERIC");
                  fw.println();
-                 fw.println("@ATTRIBUTE class {'target', 'outlier'}");
+                 fw.println("@ATTRIBUTE class {'" + name + "', 'outlier'}");
                  
                  fw.println();
                  fw.println("@DATA");
