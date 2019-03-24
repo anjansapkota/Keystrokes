@@ -82,5 +82,6 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/com/googlecode/netlib-java/netlib-java/1.1/netlib-java-1.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/github/fommil/netlib/core/1.1/core-1.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/tw/edu/ntu/csie/libsvm/3.23/libsvm-3.23.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/com/github/vbmacher/java-cup-runtime/11b/java-cup-runtime-11b.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/nz/ac/waikato/cms/weka/oneClassClassifier/1.0.2/oneClassClassifier-1.0.2.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/nz/ac/waikato/cms/weka/weka-dev/3.9.3/weka-dev-3.9.3-tests.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>

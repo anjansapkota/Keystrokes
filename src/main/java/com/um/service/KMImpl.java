@@ -24,9 +24,13 @@ public class KMImpl implements KmService {
 	public int personexists(String matricula){
 		int personID=0;
 		ArrayList <Usuario> personas = us.listaUsuarios();
-		for (int i = 0; i < personas.size(); i++) {
-			if(((personas.get(i)).getMatricula()).equals(matricula)){
-				personID = (personas.get(i)).getId();
+		if(personas.size()==0) {
+			personID = 0;
+		} else {
+			for (int i = 0; i < personas.size(); i++) {
+				if(((personas.get(i)).getMatricula()).equals(matricula)){
+					personID = (personas.get(i)).getId();
+				}
 			}
 		}
 		return personID;

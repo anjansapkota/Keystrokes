@@ -4,7 +4,10 @@ import java.sql.SQLException;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,8 @@ import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
+import weka.classifiers.meta.OneClassClassifier;
+import org.apache.commons.math3.util.MathUtils;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -445,6 +450,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         filter.setAttributeName(name);
         filter.setInputFormat(testdataset);
         testdataset = Filter.useFilter(testdataset, filter);
+        
         double percent = 0.50;
         int trainingSize = (int) Math.round(traindataset.numInstances() * percent);
         int learningSize = traindataset.numInstances() - trainingSize;
@@ -462,42 +468,44 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         Normalize filterNormlearning = new Normalize();
         filterNormlearning.setInputFormat(learning);
         learning = Filter.useFilter(learning, filterNormlearning);
-        LibSVM svm = new LibSVM();
-        svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
-        svm.buildClassifier(training);
+											/*
+											 * LibSVM classifier = new LibSVM(); svm.setSVMType(new
+											 * SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
+											 * svm.buildClassifier(training);
+											 */
+        OneClassClassifier classifier = new OneClassClassifier();
+        classifier.setTargetClassLabel(name);
+        classifier.buildClassifier(training);
         Evaluation eval = new Evaluation(training);
-        eval.evaluateModel(svm, learning);
+        eval.evaluateModel(classifier, learning);
         //print the results of modeling
         String strSummary = eval.toSummaryString();
         System.out.println("" + strSummary);
-        saveModelToFile(name, svm);
+        //saveModelToFile(name, classifier);
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
-        double []classes = new double[testdataset.size()];
-		Instances dataRaw = new Instances("TestInstances", atts, 6);
+        List<Double> classes = new ArrayList<Double>();
+		/*
+		 * Instances dataRaw = new Instances("TestInstances", atts, 6); for(Key
+		 * row:testdata) { double[] raw = new double[6]; raw[0] = row.getLetter1();
+		 * raw[1] = row.getLetter2(); raw[2] = row.getPress1_press2(); raw[3] =
+		 * row.getPress1_release1(); raw[4] = row.getRelease1_press2(); raw[5] =
+		 * row.getRelease1_release2(); dataRaw.add(new DenseInstance(6, raw)); }
+		 */
 			
-			
-			for(Key row:testdata) {
-				double[] raw = new double[6];
-					raw[0] = row.getLetter1();
-					raw[1] = row.getLetter2();
-					raw[2] = row.getPress1_press2();
-					raw[3] = row.getPress1_release1();
-					raw[4] = row.getRelease1_press2();
-					raw[5] = row.getRelease1_release2();
-				dataRaw.add(new DenseInstance(6, raw));
-	        }
-			
-			if (testdataset.classIndex() == -1) {
-	            testdataset.setClassIndex(testdataset.numAttributes() - 1);
-	        }
+			//if (testdataset.classIndex() == -1) {
+	          //  testdataset.setClassIndex(testdataset.numAttributes() - 1);
+	        //}
 //			Normalize filterNormdataRaw = new Normalize();
 //	        filterNormdataRaw.setInputFormat(dataRaw);
 //	        dataRaw = Filter.useFilter(dataRaw, filterNormdataRaw);
 			for(int i=0; i<testdataset.size()-1; i++) {
-				 Instance instance = testdataset.get(i);				 
-				 classes[i] = svm.classifyInstance(instance); //
-				 System.out.println(", predicted: " + training.classAttribute().value((int) classes[i]));
+				 Instance instance = testdataset.get(i);
+				 instance.setClassMissing();
+				 classes.add(classifier.classifyInstance(instance)); //
+				 if(classes.size() < i ) {
+				 System.out.println(", predicted: " + training.classAttribute().value(classes.get(i).intValue()));
+				 }
 	        }
 		//Print results of classification
 //        for(Double i:classes) {
@@ -505,7 +513,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 //        }
 	}
 	
-    public void saveTrainARFF (Vector <Key> vD, String filename){
+    public void saveTestARFF (Vector <Key> vD, String filename){
+    	
         try{         
             PrintWriter fw = new PrintWriter(filename + ".arff");
                  fw.flush();
@@ -517,14 +526,14 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1R2  NUMERIC");
                  fw.println();
-                 fw.println("@ATTRIBUTE class {'" + name + "'}");
+                 fw.println("@ATTRIBUTE class {'target', 'outlier'}");
                  
                  fw.println();
                  fw.println("@DATA");
                  
                  for(int i=0; i<vD.size(); i++){
             	   Key a = vD.get(i);
-            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + name);
+            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ", ?");
                 }
                 fw.close();
         } catch(Exception ex){}finally{
@@ -532,10 +541,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         }
         
     }
-    public void saveTestARFF (Vector <Key> vD, String filename){
+    public void saveTrainARFF (Vector <Key> input, String filename){    	
         try{
          
-            PrintWriter fw = new PrintWriter(filename + ".arff");
+            	 PrintWriter fw = new PrintWriter(filename + ".arff");
                  fw.flush();
                  fw.println("@RELATION keys");
                  fw.println("@ATTRIBUTE letter1  NUMERIC");
@@ -545,15 +554,98 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  fw.println("@ATTRIBUTE R1P2  NUMERIC");
                  fw.println("@ATTRIBUTE R1R2  NUMERIC");
                  fw.println();
-                 fw.println("@ATTRIBUTE class {'" + name + "'}");
+                 fw.println("@ATTRIBUTE class {'" + name + "', 'outlier'}");
                  fw.println();
                  fw.println("@DATA");
                  
-                 for(int i=0; i<vD.size(); i++){
-            	   Key a = vD.get(i);
-            	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + name);
-                }
-                fw.close();
+                 
+                 List<Long> sampleA = new ArrayList<Long>();
+                 List<Long> sampleB = new ArrayList<Long>();
+                 List<Long> sampleC = new ArrayList<Long>();
+                 List<Long> sampleD = new ArrayList<Long>();
+             	for (int i = 0; i < input.size(); i++) {
+             		sampleA.add(input.get(i).getPress1_release1());
+             		sampleB.add(input.get(i).getPress1_press2());
+             		sampleC.add(input.get(i).getRelease1_press2());
+             		sampleD.add(input.get(i).getRelease1_release2());
+         		}
+             	 	
+                 List<Long> sample1A = new ArrayList<Long>();
+                 List<Long> sample1B = new ArrayList<Long>();
+                 List<Long> sample1C = new ArrayList<Long>();
+                 List<Long> sample1D = new ArrayList<Long>();
+                 List<Long> sample2A = new ArrayList<Long>();
+                 List<Long> sample2B = new ArrayList<Long>();
+                 List<Long> sample2C = new ArrayList<Long>();
+                 List<Long> sample2D = new ArrayList<Long>();
+                 Collections.sort(sampleA);
+                 Collections.sort(sampleB);
+                 Collections.sort(sampleC);
+                 Collections.sort(sampleD);
+                 if (input.size() % 2 == 0) {
+                 	sample1A = sampleA.subList(0, sampleA.size() / 2);
+                 	sample2A = sampleA.subList(sampleA.size() / 2, sampleA.size());
+                 	sample1B = sampleB.subList(0, sampleB.size() / 2);
+                 	sample2B = sampleB.subList(sampleB.size() / 2, sampleB.size());
+                 	sample1C = sampleC.subList(0, sampleC.size() / 2);
+                 	sample2C = sampleC.subList(sampleC.size() / 2, sampleC.size());
+                 	sample1D = sampleD.subList(0, sampleD.size() / 2);
+                 	sample2D = sampleD.subList(sampleD.size() / 2, sampleD.size());
+                 } else {
+                 	sample1A = sampleA.subList(0, sampleA.size() / 2);
+                 	sample2A = sampleA.subList(sampleA.size() / 2 + 1, sampleA.size());
+                 	sample1B = sampleB.subList(0, sampleB.size() / 2);
+                 	sample2B = sampleB.subList(sampleB.size() / 2  + 1, sampleB.size());
+                 	sample1C = sampleC.subList(0, sampleC.size() / 2);
+                 	sample2C = sampleC.subList(sampleC.size() / 2 + 1, sampleC.size());
+                 	sample1D = sampleD.subList(0, sampleD.size() / 2);
+                 	sample2D = sampleD.subList(sampleD.size() / 2 + 1, sampleD.size());
+                 }        
+                 double Aq1 = getMedian(sample1A);
+                 double Aq3 = getMedian(sample2A);
+                 double Bq1 = getMedian(sample1B);
+                 double Bq3 = getMedian(sample2B);
+                 double Cq1 = getMedian(sample1C);
+                 double Cq3 = getMedian(sample2C);
+                 double Dq1 = getMedian(sample1D);
+                 double Dq3 = getMedian(sample2D);
+                 double Aiqr = Aq3 - Aq1;
+                 double Biqr = Bq3 - Bq1;
+                 double Ciqr = Cq3 - Cq1;
+                 double Diqr = Dq3 - Dq1;
+                 double AlowerFence = Aq1 - 1.5 * Aiqr;
+                 double AupperFence = Aq3 + 1.5 * Aiqr;
+                 double BlowerFence = Bq1 - 1.5 * Biqr;
+                 double BupperFence = Bq3 + 1.5 * Biqr;
+                 double ClowerFence = Cq1 - 1.5 * Ciqr;
+                 double CupperFence = Cq3 + 1.5 * Ciqr;
+                 double DlowerFence = Dq1 - 1.5 * Diqr;
+                 double DupperFence = Dq3 + 1.5 * Diqr;
+                 for (int i = 0; i < input.size(); i++) {
+                	Boolean detected = false;
+                	Key a = input.get(i);
+                	Long A = a.getPress1_release1();
+                 	Long B = a.getPress1_press2();
+                 	Long C = a.getRelease1_press2();
+                 	Long D = a.getRelease1_release2();        			
+                     if (A < AlowerFence || A > AupperFence)
+                    	 detected = true;
+                     
+                     else if (B < AlowerFence || B > AupperFence)
+                    	 detected = true;
+                     
+                     else if (C < AlowerFence || C > AupperFence)
+                    	 detected = true;
+                     
+                     else if (D < AlowerFence || D > AupperFence)
+                    	 detected = true;
+                     
+                     if(detected)
+                    	 fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + "outlier");
+                     else fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + name);
+                 }
+
+                 fw.close();
         } catch(Exception ex){}finally{
             
         }
@@ -577,4 +669,99 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		}
 		return model;
 	}
+	
+	public static List<Long> getOutliers(Vector <Key> input) {
+        List<Long> sampleA = new ArrayList<Long>();
+        List<Long> sampleB = new ArrayList<Long>();
+        List<Long> sampleC = new ArrayList<Long>();
+        List<Long> sampleD = new ArrayList<Long>();
+    	for (int i = 0; i < input.size(); i++) {
+    		sampleA.add(input.get(i).getPress1_release1());
+    		sampleB.add(input.get(i).getPress1_press2());
+    		sampleC.add(input.get(i).getRelease1_press2());
+    		sampleD.add(input.get(i).getRelease1_release2());
+		}
+    	 	
+        List<Long> output = new ArrayList<Long>();
+
+        List<Long> sample1A = new ArrayList<Long>();
+        List<Long> sample1B = new ArrayList<Long>();
+        List<Long> sample1C = new ArrayList<Long>();
+        List<Long> sample1D = new ArrayList<Long>();
+        List<Long> sample2A = new ArrayList<Long>();
+        List<Long> sample2B = new ArrayList<Long>();
+        List<Long> sample2C = new ArrayList<Long>();
+        List<Long> sample2D = new ArrayList<Long>();
+        Collections.sort(sampleA);
+        Collections.sort(sampleB);
+        Collections.sort(sampleC);
+        Collections.sort(sampleD);
+        if (input.size() % 2 == 0) {
+        	sample1A = sampleA.subList(0, sampleA.size() / 2);
+        	sample2A = sampleA.subList(sampleA.size() / 2, sampleA.size());
+        	sample1B = sampleB.subList(0, sampleB.size() / 2);
+        	sample2B = sampleB.subList(sampleB.size() / 2, sampleB.size());
+        	sample1C = sampleC.subList(0, sampleC.size() / 2);
+        	sample2C = sampleC.subList(sampleC.size() / 2, sampleC.size());
+        	sample1D = sampleD.subList(0, sampleD.size() / 2);
+        	sample2D = sampleD.subList(sampleD.size() / 2, sampleD.size());
+        } else {
+        	sample1A = sampleA.subList(0, sampleA.size() / 2);
+        	sample2A = sampleA.subList(sampleA.size() / 2 + 1, sampleA.size());
+        	sample1B = sampleB.subList(0, sampleB.size() / 2);
+        	sample2B = sampleB.subList(sampleB.size() / 2  + 1, sampleB.size());
+        	sample1C = sampleC.subList(0, sampleC.size() / 2);
+        	sample2C = sampleC.subList(sampleC.size() / 2 + 1, sampleC.size());
+        	sample1D = sampleD.subList(0, sampleD.size() / 2);
+        	sample2D = sampleD.subList(sampleD.size() / 2 + 1, sampleD.size());
+        }        
+        double Aq1 = getMedian(sample1A);
+        double Aq3 = getMedian(sample2A);
+        double Bq1 = getMedian(sample1B);
+        double Bq3 = getMedian(sample2B);
+        double Cq1 = getMedian(sample1C);
+        double Cq3 = getMedian(sample2C);
+        double Dq1 = getMedian(sample1D);
+        double Dq3 = getMedian(sample2D);
+        double Aiqr = Aq3 - Aq1;
+        double Biqr = Bq3 - Bq1;
+        double Ciqr = Cq3 - Cq1;
+        double Diqr = Dq3 - Dq1;
+        double AlowerFence = Aq1 - 1.5 * Aiqr;
+        double AupperFence = Aq3 + 1.5 * Aiqr;
+        double BlowerFence = Bq1 - 1.5 * Biqr;
+        double BupperFence = Bq3 + 1.5 * Biqr;
+        double ClowerFence = Cq1 - 1.5 * Ciqr;
+        double CupperFence = Cq3 + 1.5 * Ciqr;
+        double DlowerFence = Dq1 - 1.5 * Diqr;
+        double DupperFence = Dq3 + 1.5 * Diqr;
+        for (int i = 0; i < input.size(); i++) {
+        	Long A = input.get(i).getPress1_release1();
+        	Long B = input.get(i).getPress1_press2();
+        	Long C = input.get(i).getRelease1_press2();
+        	Long D = input.get(i).getRelease1_release2();        			
+            if (A < AlowerFence || A > AupperFence)
+                output.add(input.get(i).getPress1_release1());
+            
+            if (B < AlowerFence || B > AupperFence)
+                output.add(input.get(i).getPress1_release1());
+            
+            if (C < AlowerFence || C > AupperFence)
+                output.add(input.get(i).getPress1_release1());
+            
+            if (D < AlowerFence || D > AupperFence)
+                output.add(input.get(i).getPress1_release1());
+            
+        }
+        return output;
+    }
+
+    private static double getMedian(List<Long> data) {
+        if (data.size() % 2 == 0)
+            return (data.get(data.size() / 2) + data.get(data.size() / 2 - 1)) / 2;
+        else
+            return data.get(data.size() / 2);
+    }
+	
+	
 }
