@@ -85,7 +85,7 @@ public class KeysManagementController {
 		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
 		System.out.println("The final possiblity of matching this user is "+ ResultTable.getScore() * 100 + "%.");
 		if(listofKeysRecieved.size() > 100) {
-			if(ResultTable.getScore() < 0.25) {
+			if(ResultTable.getScore() < 0.40) {
 				response=2;
 			}			
 			if(ResultTable.getScore() > 0.70) {

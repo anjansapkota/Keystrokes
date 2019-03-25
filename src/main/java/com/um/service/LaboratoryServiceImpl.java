@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,7 +131,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	@Override
 	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary, String Name ) throws Exception {
-		name = Name;				
+		name = Name;
+		double poss_by_class = classify (persona1Summary, personaPruebaSummary);
 		//HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or unique_pair_diagraph
 		int matchcount = 0;
 		int N_sample = 0;
@@ -197,7 +199,6 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     			  	}
     			}
     		}
-    	classify (teclasIgualesPersona1, teclasIgualespersonaPrueba);
     	double nr = 0;
     	double score = 0;
     	ResultTable.setMatchesResult(matchcount);
@@ -212,10 +213,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         	nr = Mean(normality_results);
         	System.out.println("The possiblity of matching this user through pdf is  "+ nr);
         	System.out.println("Matchcount = "+ matchcount  + " Total Sample = "+ N_sample*4);
-        	score = nr + ResultTable.getCorrelationTestResult().getA() + ResultTable.getCorrelationTestResult().getB() + + ResultTable.getCorrelationTestResult().getC()+ ResultTable.getCorrelationTestResult().getD();
+        	score = poss_by_class + nr + ResultTable.getCorrelationTestResult().getA() + ResultTable.getCorrelationTestResult().getB() + + ResultTable.getCorrelationTestResult().getC()+ ResultTable.getCorrelationTestResult().getD();
         	
     	}
-    	score = score/5;
+    	score = score/6;
     	ResultTable.setScore(score);    	
     	return ResultTable;
     }
@@ -410,7 +411,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
 	
 	
-	public void classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
+	public double classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
 		saveTrainARFF(traindata, "Train_" + name);
 		saveTestARFF(testdata, "Test_" + name);
 		DataSource source1 = new DataSource("Train_" + name+".arff");
@@ -476,7 +477,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         classifier.setTargetClassLabel(name);
         classifier.buildClassifier(training);
         Evaluation eval = new Evaluation(training);
-        eval.evaluateModel(classifier, learning);
+        eval.crossValidateModel(classifier, training, 10, new Random(1));
+        //eval.evaluateModel(classifier, learning);
         //print the results of modeling
         String strSummary = eval.toSummaryString();
         System.out.println("" + strSummary);
@@ -505,18 +507,20 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				 System.out.println(", predicted: " + training.classAttribute().value(classes.get(i).intValue()));
 		}
 		int yes = 0;
-		int no = 0;
+		int  no = 0;
 			for(int i = 0; i<classes.size(); i++) {
 				if(classes.get(i)==0) {
 					yes++;
 				} else no++;
 			}
-		double Possibility = yes/classes.size();	
-		System.out.println("Possiblity by classification is" + Possibility);	
+			
+		double Possibility = ((double)yes)/((double)classes.size());	
+		System.out.println("Possiblity by classification is " +  yes + "/" + classes.size() + "   = " + Possibility*100 +"% " + yes/classes.size());	
 		//Print results of classification
 //        for(Double i:classes) {
 //        	System.out.println("Class is " + i);
 //        }
+		return Possibility;
 	}
 	
     public void saveTestARFF (Vector <Key> vD, String filename){
@@ -634,17 +638,19 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  	Long B = a.getPress1_press2();
                  	Long C = a.getRelease1_press2();
                  	Long D = a.getRelease1_release2();        			
-                     if (A < AlowerFence || A > AupperFence)
+                     if (A < AlowerFence-500 || A > AupperFence+500)
                     	 detected = true;
                      
-                     else if (B < AlowerFence || B > AupperFence)
+				/*
+				 * else if (B < AlowerFence || B > AupperFence) detected = true;
+				 */
+                     
+                     else if (C < AlowerFence-500 || C > AupperFence+500)
                     	 detected = true;
                      
-                     else if (C < AlowerFence || C > AupperFence)
-                    	 detected = true;
-                     
-                     else if (D < AlowerFence || D > AupperFence)
-                    	 detected = true;
+				/*
+				 * else if (D < AlowerFence || D > AupperFence) detected = true;
+				 */
                      
                      if(detected)
                     	 fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + "outlier");
@@ -749,14 +755,18 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             if (A < AlowerFence || A > AupperFence)
                 output.add(input.get(i).getPress1_release1());
             
-            if (B < AlowerFence || B > AupperFence)
-                output.add(input.get(i).getPress1_release1());
+			/*
+			 * if (B < AlowerFence || B > AupperFence)
+			 * output.add(input.get(i).getPress1_release1());
+			 */
             
             if (C < AlowerFence || C > AupperFence)
                 output.add(input.get(i).getPress1_release1());
             
-            if (D < AlowerFence || D > AupperFence)
-                output.add(input.get(i).getPress1_release1());
+			/*
+			 * if (D < AlowerFence || D > AupperFence)
+			 * output.add(input.get(i).getPress1_release1());
+			 */
             
         }
         return output;
