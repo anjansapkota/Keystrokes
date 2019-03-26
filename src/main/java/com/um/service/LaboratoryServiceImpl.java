@@ -1,4 +1,5 @@
 package com.um.service;
+import java.io.File;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
@@ -38,7 +39,6 @@ import weka.filters.unsupervised.attribute.Remove;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.meta.OneClassClassifier;
-import org.apache.commons.math3.util.MathUtils;
 
 @Service("laboratoryService")
 public class LaboratoryServiceImpl implements LaboratoryService {
@@ -140,6 +140,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		Vector<Long> digraphsList = new Vector<Long>();
     	Vector<Key> teclasIgualespersonaPrueba = new Vector <Key> ();
     	Vector<Key> teclasIgualesPersona1 = new Vector <Key> ();
+    	Vector<Key> commonKeysPrueba = new Vector <Key> ();
+    	Vector<Key> commonKeysPersona1 = new Vector <Key> ();
     	for(int i=1; i<personaPruebaSummary.size(); i++) {                //Prueba is i              //person is j
     		int confirmation = 0;
     		long l1 = personaPruebaSummary.get(i).getLetter1();
@@ -160,12 +162,16 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     					  ids.setPrueba(tempkeys1);
     					  ids.setPerson(tempkeys2);
     					  collectionPD.put(digraph, ids);
+    					  commonKeysPrueba.add(personaPruebaSummary.get(i));
+    					  commonKeysPersona1.add(persona1Summary.get(j));
     					  confirmation = 1;
     				  }else if(confirmation==0) {										//to avoid duplication of keys(model) while sorting out common digraphs.
     						  collectionPD.get(digraph).getPrueba().add(personaPruebaSummary.get(i));
     						  confirmation = 1;
+    						  commonKeysPrueba.add(personaPruebaSummary.get(i));
     					  }
-    					  collectionPD.get(digraph).getPerson().add(persona1Summary.get(j));    					  
+    					  collectionPD.get(digraph).getPerson().add(persona1Summary.get(j));
+    					  commonKeysPersona1.add(persona1Summary.get(j));
     				  
     				  
     				  //Matching Analysis and sorting out common key press
@@ -199,6 +205,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
     			  	}
     			}
     		}
+    	if(commonKeysPersona1.size()>26) {
+    		System.out.println("Printing the results of the second classification.");
+        	double poss_by_class2 = classify (commonKeysPersona1, commonKeysPrueba);        	
+    	}
     	double nr = 0;
     	double score = 0;
     	ResultTable.setMatchesResult(matchcount);
@@ -414,13 +424,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	public double classify (Vector <Key> traindata, Vector <Key> testdata) throws Exception {
 		saveTrainARFF(traindata, "Train_" + name);
 		saveTestARFF(testdata, "Test_" + name);
-		DataSource source1 = new DataSource("Train_" + name+".arff");
+		DataSource source1 = new DataSource("data_workshop/" + "Train_" + name+".arff");
         Instances traindataset  = source1.getDataSet();
         if (traindataset.classIndex() == -1) {
-            System.out.println("reset index...");
             traindataset.setClassIndex(traindataset.numAttributes() - 1);
         }
-        DataSource source2 = new DataSource("Test_" + name+".arff");
+        DataSource source2 = new DataSource("data_workshop/"+"Test_" + name+".arff");
         Instances testdataset  = source2.getDataSet();
 //        if (testdataset.classIndex() == -1) {
 //            System.out.println("reset index...");
@@ -474,14 +483,14 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 											 * svm.buildClassifier(training);
 											 */
         OneClassClassifier classifier = new OneClassClassifier();
-        classifier.setTargetClassLabel(name);
-        classifier.buildClassifier(training);
+        classifier.setTargetClassLabel(name);        
         Evaluation eval = new Evaluation(training);
-        eval.crossValidateModel(classifier, training, 10, new Random(1));
+        eval.crossValidateModel(classifier, training, 12, new Random(1));
         //eval.evaluateModel(classifier, learning);
         //print the results of modeling
         String strSummary = eval.toSummaryString();
         System.out.println("" + strSummary);
+        classifier.buildClassifier(training);
         //saveModelToFile(name, classifier);
 //        OneClassClassifier oc = new OneClassClassifier();
 //        oc.buildClassifier(traindataset);
@@ -504,7 +513,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				 Instance instance = testdataset.get(i);
 				 instance.setClassMissing();
 				 classes.add(classifier.classifyInstance(instance)); //
-				 System.out.println(", predicted: " + training.classAttribute().value(classes.get(i).intValue()));
+				 System.out.println("Predicted: " + training.classAttribute().value(classes.get(i).intValue()));
 		}
 		int yes = 0;
 		int  no = 0;
@@ -513,9 +522,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 					yes++;
 				} else no++;
 			}
-			
 		double Possibility = ((double)yes)/((double)classes.size());	
-		System.out.println("Possiblity by classification is " +  yes + "/" + classes.size() + "   = " + Possibility*100 +"% " + yes/classes.size());	
+		System.out.println("Possiblity by classification is " +  yes + "/" + classes.size() + "   = " + Possibility*100 +"% ");	
 		//Print results of classification
 //        for(Double i:classes) {
 //        	System.out.println("Class is " + i);
@@ -525,9 +533,10 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	
     public void saveTestARFF (Vector <Key> vD, String filename){
     	
-        try{         
-            PrintWriter fw = new PrintWriter(filename + ".arff");
-                 fw.flush();
+        try{
+        	File file = new File("data_workshop/" + filename + ".arff");
+       	 	PrintWriter fw = new PrintWriter(file);
+       	 		 fw.flush();
                  fw.println("@RELATION keys");
                  fw.println("@ATTRIBUTE letter1  NUMERIC");
                  fw.println("@ATTRIBUTE letter2  NUMERIC");
@@ -546,15 +555,21 @@ public class LaboratoryServiceImpl implements LaboratoryService {
             	   fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + "," + a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + ", ?");
                 }
                 fw.close();
-        } catch(Exception ex){}finally{
-            
+        } catch(Exception ex){}finally{            
         }
-        
     }
     public void saveTrainARFF (Vector <Key> input, String filename){    	
         try{
-         
-            	 PrintWriter fw = new PrintWriter(filename + ".arff");
+	        	String dir = "/" + "data_workshop" + "/";;
+	    		//String realPathtoUploads = "C:\\uploadsE65\\" + uploadsDir;
+	    		java.io.File directory = new java.io.File(dir);
+	    		if (! directory.exists()){
+	    	        directory.mkdir();
+	    	        // If you require it to make the entire directory path including parents,
+	    	        // use directory.mkdirs(); here instead.
+	    	    }
+	    		File file = new File("data_workshop/" + filename + ".arff");
+            	 PrintWriter fw = new PrintWriter(file);
                  fw.flush();
                  fw.println("@RELATION keys");
                  fw.println("@ATTRIBUTE letter1  NUMERIC");
@@ -638,18 +653,18 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                  	Long B = a.getPress1_press2();
                  	Long C = a.getRelease1_press2();
                  	Long D = a.getRelease1_release2();        			
-                     if (A < AlowerFence-500 || A > AupperFence+500)
+                     if (A < AlowerFence || A > AupperFence)
                     	 detected = true;
                      
 				/*
-				 * else if (B < AlowerFence || B > AupperFence) detected = true;
+				 * else if (B < BlowerFence || B > BupperFence) detected = true;
 				 */
                      
-                     else if (C < AlowerFence-500 || C > AupperFence+500)
+                     else if (C < ClowerFence || C > CupperFence)
                     	 detected = true;
                      
 				/*
-				 * else if (D < AlowerFence || D > AupperFence) detected = true;
+				 * else if (D < DlowerFence || D > DupperFence) detected = true;
 				 */
                      
                      if(detected)
@@ -756,11 +771,11 @@ public class LaboratoryServiceImpl implements LaboratoryService {
                 output.add(input.get(i).getPress1_release1());
             
 			/*
-			 * if (B < AlowerFence || B > AupperFence)
+			 * if (B < BlowerFence || B > BupperFence)
 			 * output.add(input.get(i).getPress1_release1());
 			 */
             
-            if (C < AlowerFence || C > AupperFence)
+            if (C < ClowerFence || C > CupperFence)
                 output.add(input.get(i).getPress1_release1());
             
 			/*
