@@ -6,6 +6,7 @@
 		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
 		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap-theme.min.css}" />
 		<link rel="stylesheet" type="text/css" th:href="@{css/sweetalert.css}" />
+		<link rel="stylesheet" type="text/css" th:href="@{css/style.css}" />
 		<script th:src="@{js/sweetalert.js}" ></script>
 		<script th:src="@{js/jquery.js}" ></script>
 		<script th:src="@{js/js/refresh.js}" ></script>
@@ -17,7 +18,6 @@
 	        <div class="container-fluid">
 			    <!-- Brand and toggle get grouped for better mobile display -->
 			    <div class="navbar-header">
-			    	<a class="navbar-brand" href="/kyd/inicio">DPI</a>
 					<a class="navbar-brand text-white" href="/kyd/inicio"><strong>HOME</strong></a>
 			    </div>
 				<!-- Collect the nav links, forms, and other content for toggling -->
@@ -27,6 +27,7 @@
 						    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><strong style="font-size: 20px;" th:text="${user}">a</strong> <span class="caret"></span></a>
 						    <ul class="dropdown-menu">
 						    	<!-- <li><a href="/kyd/changePassword">Change Password</a></li> -->
+							    <li><a onclick="change_pass()">Change Password</a></li>
 							    <li><a href="/kyd/logout">Logout</a></li>
 							    <li role="separator" class="divider"></li>
 							    <li><a href="#"></a></li>
@@ -39,7 +40,7 @@
 	    </div>
 	<div class="container">
 	    <div class="col-12 mt-5" style = "">
-			<div style="margin-top: 20%; text-align: center;">
+			<div style="text-align: center;">
 				<h1 style="color: Black; font-size: 60px;" >Write a little bit about how you feel today.</h1>
 				<form id="answerform" th:action="@{/#}" method="POST">
 					<div class="form-group">
@@ -50,7 +51,7 @@
 			</div>
 		</div>
 	</div>
-			<span th:if="${regcomplete}== si">
+		<span th:if="${regcomplete}== si">
 		<script th:inline="javascript">
 		swal("", {
 			  title: "Registration Successful! Welcome!!",
@@ -58,6 +59,62 @@
 			  buttons:false,
 			  timer:2000,
 		});	
+		</script>
+		</span>
+		<script th:inline="javascript">
+		function change_pass() {
+			swal({
+				  title: "You are about to change the password.",
+				  text: "Type Carefully!!",
+				  icon: "warning",
+				  content: {
+				    element: "input",
+				    attributes: {
+				      placeholder: "Type your password",
+				      type: "password",
+				    },
+				  },
+				})
+				.then((willChange) => {
+				  if (willChange) {
+					  passwordChange(willChange);
+				  } else {
+				    swal("Cancelled Changes");
+				  }
+				});
+		}
+		
+			function passwordChange(password) {
+				$.ajax({
+					type : "POST",
+					url : "SdpmSt204snirkdT/5S4dkas2dkasdSD/"+password+"/aFrt6nalResaW3qw",
+					success : function(result) {
+						  if (result.passwordChanged == 1) {
+					    			swal("You have changed the  password Successfuly!", {
+					    				  icon: "success",
+					    				  buttons:false,
+					    				  timer:4000,
+					    			});
+					    			setTimeout(console.log("Password Changes", 3000));
+								location.href = '/kyd/logout';					    		
+					    }
+					},
+					error : function(e) {
+						console.log("ERROR: ", e);
+					}
+				})
+			}		
+		</script>		
+		<span th:if="${requestingPasswordChange}== Si">
+		</span>
+		<span th:if="${passwordChanged}== 1">
+		<script th:inline="javascript">
+		swal("You have changed the  password Successfuly!", {
+			  icon: "success",
+			  buttons:false,
+			  timer:4000,
+		});
+		window.location.replace('/kyd/logout');
 		</script>
 		</span>	
 	</body>

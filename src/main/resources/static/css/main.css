@@ -34,7 +34,9 @@
 body, html {
 	height: 100%;
 	font-family: Ubuntu-Regular, sans-serif;
+	background: lavender;
 }
+
 
 /*---------------------------------------------*/
 a {
@@ -175,7 +177,6 @@ iframe {
   align-items: center;
   padding: 15px;
   position: relative;
-  background-color: #fff;
 }
 
 .wrap-login100 {
