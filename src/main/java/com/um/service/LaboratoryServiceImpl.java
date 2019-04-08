@@ -36,6 +36,7 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.meta.OneClassClassifier;
@@ -482,27 +483,35 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 											 * SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
 											 * svm.buildClassifier(training);
 											 */
-        OneClassClassifier classifier = new OneClassClassifier();
-        classifier.setTargetClassLabel(name);        
+        OneClassClassifier one_class_classifier = new OneClassClassifier();
+        one_class_classifier.setTargetClassLabel(name);        
         Evaluation eval = new Evaluation(training);
-        eval.crossValidateModel(classifier, training, 12, new Random(1));
+        eval.crossValidateModel(one_class_classifier, training, 12, new Random(1));
         //eval.evaluateModel(classifier, learning);
         //print the results of modeling
         String strSummary = eval.toSummaryString();
         System.out.println("" + strSummary);
-        classifier.buildClassifier(training);
-        //saveModelToFile(name, classifier);
-//        OneClassClassifier oc = new OneClassClassifier();
-//        oc.buildClassifier(traindataset);
-        List<Double> classes = new ArrayList<Double>();
-		/*
-		 * Instances dataRaw = new Instances("TestInstances", atts, 6); for(Key
-		 * row:testdata) { double[] raw = new double[6]; raw[0] = row.getLetter1();
-		 * raw[1] = row.getLetter2(); raw[2] = row.getPress1_press2(); raw[3] =
-		 * row.getPress1_release1(); raw[4] = row.getRelease1_press2(); raw[5] =
-		 * row.getRelease1_release2(); dataRaw.add(new DenseInstance(6, raw)); }
-		 */
-			
+        one_class_classifier.buildClassifier(training);
+        
+        
+        LibSVM svm = new LibSVM();
+        svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
+        svm.buildClassifier(training);
+        Evaluation eval2 = new Evaluation(training);
+        eval2.evaluateModel(svm, learning);
+        //print the results of modeling
+        String strSummary2 = eval.toSummaryString();
+        System.out.println("" + strSummary2);
+             
+        double Possibility = execute_classifier(one_class_classifier, testdataset);
+        double Possibility2 = execute_classifier(svm, testdataset);
+		Possibility = ((Possibility + Possibility2)/2);
+		return Possibility;
+	}
+	
+	public double execute_classifier(Classifier classifier, Instances testdataset) {
+		double possibility = 0;
+		List<Double> classes = new ArrayList<Double>();
 			if (testdataset.classIndex() == -1) {
 	            testdataset.setClassIndex(testdataset.numAttributes() - 1);
 	        }
@@ -512,8 +521,12 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			for(int i=0; i<testdataset.size()-1; i++) {
 				 Instance instance = testdataset.get(i);
 				 instance.setClassMissing();
-				 classes.add(classifier.classifyInstance(instance)); //
-				 System.out.println("Predicted: " + training.classAttribute().value(classes.get(i).intValue()));
+				 try {
+					classes.add(classifier.classifyInstance(instance));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 		int yes = 0;
 		int  no = 0;
@@ -524,11 +537,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			}
 		double Possibility = ((double)yes)/((double)classes.size());	
 		System.out.println("Possiblity by classification is " +  yes + "/" + classes.size() + "   = " + Possibility*100 +"% ");	
-		//Print results of classification
-//        for(Double i:classes) {
-//        	System.out.println("Class is " + i);
-//        }
-		return Possibility;
+		
+		
+		return possibility;
 	}
 	
     public void saveTestARFF (Vector <Key> vD, String filename){
