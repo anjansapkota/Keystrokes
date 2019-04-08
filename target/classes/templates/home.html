@@ -27,7 +27,7 @@
 						    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><strong style="font-size: 20px;" th:text="${user}">a</strong> <span class="caret"></span></a>
 						    <ul class="dropdown-menu">
 						    	<!-- <li><a href="/kyd/changePassword">Change Password</a></li> -->
-							    <li><a onclick="change_pass()">Change Password</a></li>
+							    <li><a href="#" onclick="change_pass()">Change Password</a></li>
 							    <li><a href="/kyd/logout">Logout</a></li>
 							    <li role="separator" class="divider"></li>
 							    <li><a href="#"></a></li>
@@ -89,14 +89,14 @@
 					type : "POST",
 					url : "SdpmSt204snirkdT/5S4dkas2dkasdSD/"+password+"/aFrt6nalResaW3qw",
 					success : function(result) {
-						  if (result.passwordChanged == 1) {
+						  if (result == 1) {
 					    			swal("You have changed the  password Successfuly!", {
 					    				  icon: "success",
 					    				  buttons:false,
 					    				  timer:4000,
 					    			});
-					    			setTimeout(console.log("Password Changes", 3000));
-								location.href = '/kyd/logout';					    		
+					    			setTimeout(function(){ location.href = '/kyd/logout'; }, 4000);
+													    		
 					    }
 					},
 					error : function(e) {
