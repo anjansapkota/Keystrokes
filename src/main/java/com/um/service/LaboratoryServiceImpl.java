@@ -494,18 +494,18 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         one_class_classifier.buildClassifier(training);
         
         
-        LibSVM svm = new LibSVM();
-        svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
-        svm.buildClassifier(training);
-        Evaluation eval2 = new Evaluation(training);
-        eval2.evaluateModel(svm, learning);
+       // LibSVM svm = new LibSVM();
+        //svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_ONE_CLASS_SVM, LibSVM.TAGS_SVMTYPE));
+        //svm.buildClassifier(training);
+        //Evaluation eval2 = new Evaluation(training);
+        //eval2.evaluateModel(svm, learning);
         //print the results of modeling
-        String strSummary2 = eval.toSummaryString();
-        System.out.println("" + strSummary2);
+        //String strSummary2 = eval2.toSummaryString();
+        //System.out.println("" + strSummary2);
              
         double Possibility = execute_classifier(one_class_classifier, testdataset);
-        double Possibility2 = execute_classifier(svm, testdataset);
-		Possibility = ((Possibility + Possibility2)/2);
+        //double Possibility2 = execute_classifier(svm, testdataset);
+		//Possibility = ((Possibility + Possibility2)/2);
 		return Possibility;
 	}
 	
