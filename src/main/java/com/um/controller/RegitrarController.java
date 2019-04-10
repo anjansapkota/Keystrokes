@@ -18,16 +18,16 @@ public class RegitrarController {
 	@Autowired
 	private UsuarioService usuarioService;
 	
-	@RequestMapping(value={"/registrar"}, method = RequestMethod.GET)
+	@RequestMapping(value={"/register"}, method = RequestMethod.GET)
 	public ModelAndView registro(){
 		ModelAndView modelAndView = new ModelAndView();
 		Usuario usuario = new Usuario();
 		modelAndView.addObject("usuario", usuario);
-		modelAndView.setViewName("registrar");
+		modelAndView.setViewName("register");
 		return modelAndView;
 	}
 	
-	@RequestMapping(value = {"/registrar"}, method = RequestMethod.POST)
+	@RequestMapping(value = {"/register"}, method = RequestMethod.POST)
 	public ModelAndView crearUsuario(@Valid Usuario usuario, BindingResult bindingResult) {
 		
 		ModelAndView modelAndView = new ModelAndView();	
@@ -38,12 +38,12 @@ public class RegitrarController {
 			error = "firstlettercantbe0";
 			modelAndView.addObject("error", error);
 			modelAndView.addObject("usuario", new Usuario());
-			modelAndView.setViewName("registrar");
+			modelAndView.setViewName("register");
 		} else if (bindingResult.hasErrors()) {
 			error = "Si";
 			modelAndView.addObject("error", error);
 			modelAndView.addObject("usuario", new Usuario());
-			modelAndView.setViewName("registrar");
+			modelAndView.setViewName("register");
 		}else if(check == 0) {
 			usuario.setActivo(1);
 			usuarioService.guardarUsuario(usuario);
@@ -54,7 +54,7 @@ public class RegitrarController {
 			modelAndView.addObject("error", error);
 			modelAndView.addObject("usuario", new Usuario());
 			modelAndView.addObject("matriculaexiste", check);
-			modelAndView.setViewName("registrar");
+			modelAndView.setViewName("register");
 			}
 		
 		return modelAndView;

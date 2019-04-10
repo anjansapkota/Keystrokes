@@ -1,4 +1,5 @@
 package com.um.service;
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -11,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+
+import javax.swing.JFrame;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +35,17 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
+import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Add;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.gui.visualize.PlotData2D;
+import weka.gui.visualize.ThresholdVisualizePanel;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.ThresholdCurve;
 import weka.classifiers.functions.LibSVM;
 import weka.classifiers.meta.OneClassClassifier;
 
@@ -45,6 +53,8 @@ import weka.classifiers.meta.OneClassClassifier;
 public class LaboratoryServiceImpl implements LaboratoryService {
 	@Autowired
 	private KmService kmService;
+	@Autowired
+	private VisualService vs;
 	@Autowired
 	 UsuarioService us;
 	private Vector <Object> keys4mdbEvry1 = new Vector  <Object> ();
@@ -502,7 +512,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         //print the results of modeling
         //String strSummary2 = eval2.toSummaryString();
         //System.out.println("" + strSummary2);
-             
+        vs.visualize(eval);   
         double Possibility = execute_classifier(one_class_classifier, testdataset);
         //double Possibility2 = execute_classifier(svm, testdataset);
 		//Possibility = ((Possibility + Possibility2)/2);
@@ -804,6 +814,4 @@ public class LaboratoryServiceImpl implements LaboratoryService {
         else
             return data.get(data.size() / 2);
     }
-	
-	
 }

@@ -160,4 +160,16 @@ public class KeysManagementController {
 		modelAndView.setViewName(view);
 		return modelAndView;
 	}
+	
+	@RequestMapping(value= {"/createGraph"}, method = RequestMethod.GET)
+	public ModelAndView createGraph() throws SQLException {
+		ModelAndView modelAndView = new ModelAndView();
+		String view = "";
+		auth = SecurityContextHolder.getContext().getAuthentication();
+		String matriculaEnTexto = auth.getName();
+			view = "registrationDetails";
+		listofKeysRecieved = null;
+		modelAndView.setViewName(view);
+		return modelAndView;
+	}
 }

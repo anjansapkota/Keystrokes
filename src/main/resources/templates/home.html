@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<head>
-	<title>E65</title>
+	<title>Home</title>
+		<link rel="icon" type="image/png" th:href="@{images/icons/favicon.ico}"/>
 		<link rel="stylesheet" type="text/css" th:href="@{css/loginStyle.css}" />
 		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
 		<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap-theme.min.css}" />
@@ -25,12 +26,9 @@
 				    <ul class="nav navbar-nav navbar-right" style="font-size: 20px;">
 					    <li class="dropdown">
 						    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><strong style="font-size: 20px;" th:text="${user}">a</strong> <span class="caret"></span></a>
-						    <ul class="dropdown-menu">
-						    	<!-- <li><a href="/kyd/changePassword">Change Password</a></li> -->
-							    <li><a href="#" onclick="change_pass()">Change Password</a></li>
-							    <li><a href="/kyd/logout">Logout</a></li>
-							    <li role="separator" class="divider"></li>
-							    <li><a href="#"></a></li>
+						    <ul class="dropdown-menu" style="background-color: black; font-size: 17px;">
+							    <li><a style="color: white;" href="#" onclick="change_pass()">Change Password</a></li>
+							    <li><a style="color: white;" href="/kyd/logout">Logout</a></li>
 						    </ul>
 					    </li>
 				    </ul>
