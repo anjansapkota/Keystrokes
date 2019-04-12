@@ -1,0 +1,16 @@
+Correctly Classified Instances         712               90.2408 %
+Incorrectly Classified Instances        77                9.7592 %
+Kappa statistic                          0.3576
+Mean absolute error                      0.1184
+Root mean squared error                  0.2778
+Relative absolute error                118.8285 %
+Root relative squared error            125.1462 %
+Total Number of Instances              789     
+
+Possiblity by classification is 358/599   = 59.766277128547586% 
+Correlation Coeffecient Results with 1130529 is  P1R1:  0.6137579369638653 P1P2 0.3798456287216008 is  R1P2:  0.44660687629611984 is  R1R2:  0.496210385206232
+T-Test Results : P1R1: 0.0 and P1P2: 0.0 and R1P2: 1.0E-5 and R1R2: 0.06913
+The possiblity of matching this user through pdf is  0.48736747258127133
+Matchcount = 5909 Total Sample = 38368
+The user was matched 5909Times.
+The final possiblity of matching this user is 50.35751785090942%.
