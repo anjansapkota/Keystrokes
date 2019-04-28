@@ -9,6 +9,7 @@ private long press1_release1;	//the time interval between a key press and the ke
 private long press1_press2;		//the time interval between a key press and the next key press.
 private long release1_press2;	//the time interval between a key release and the next key press. (-)
 private long release1_release2;	//the time interval between a key release and the next key release.
+private long press1_release2;	//the time interval between a key press and the next key release.
 
 public int getId() {
 	return id;
@@ -51,6 +52,12 @@ public long getRelease1_release2() {
 }
 public void setRelease1_release2(long release_release) {
 	this.release1_release2 = release_release;
+}
+public long getPress1_release2() {
+	return press1_release2;
+}
+public void setPress1_release2(long press1_release2) {
+	this.press1_release2 = press1_release2;
 }
 
 }

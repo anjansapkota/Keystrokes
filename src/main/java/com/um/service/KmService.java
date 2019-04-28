@@ -18,4 +18,7 @@ public interface KmService {
 	int savetoDatabase(String matricula, Vector<Key> KeysList) throws SQLException;
 
 	int deleteRepeatedKeys(String matricula) throws SQLException;
+	
+	int savetoResultsString(String realuser, String tempuser, String fraud, String score, String result)
+			throws SQLException;
 }

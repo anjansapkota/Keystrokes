@@ -16,8 +16,8 @@ var count = 0;
 var list = new Array();
 function keydown(e) {
 	var n = window.performance.now();
-	B = n - X;     //press_press    p2-p1
-	C = n - Y;     //P2-R1
+	B = n - X;     //press_press    p1-p2
+	C = n - Y;     //R1-P2
 	X = n;
 	
 	KM=KN;
@@ -36,7 +36,7 @@ function kp(e) {
 
 function keyup(e) {
 	var m = window.performance.now();
-	A = m - X;      //press_release r1-p1
+	A = m - X;      //press_release p1-r1
 	D = m - Y;      // R1-R2
 	Y = m;
 	if(count>0){
@@ -74,17 +74,74 @@ function ajaxFire(list) {
 					data : JSON.stringify(list),
 					dataType : 'json',
 					success : function(result) {
-						if(result ==2){
+						if(result == 2){
 							swal("", {
 								  title: "You dont seem like the real user! You exam shall be cancelled",
 								  icon: "error",
 								  buttons:false,
-								  timer:5000
+								  timer:2000
 							});
+							setTimeout(function () {
+								SaveAction();    
+					    		}, 3000);
+						} else if(result == 1){
+							swal("", {
+								  title: "Good Job!! ",
+								  icon: "success",
+								  buttons:false,
+								  timer:2000
+							});
+							setTimeout(function () {
+								SaveAction();    
+					    		}, 3000);
 						}
+						
 					},
 					error : function(e) {
 						console.log("ERROR: ", e);
 					}
 				})
+}
+
+function saveresult(a) {
+	 var data = { tempuser: a };
+	    return $.ajax({
+	        url: 'saveresult',
+	        type: 'POST',
+	        data:data
+	    });
+}
+
+function SaveAction(){
+	swal({
+		  text: 'Please provide your matricula.',
+		  content: "input",
+		  button: {
+		    text: "Search!",
+		    closeModal: false,
+		  },
+		})
+		.then(matricula => {
+		  if (matricula) {
+			  saveresult(matricula).then(function (r) {
+			      if(r == 1){
+			  		swal("", {
+			  			title: "Thank you!",
+			  			icon: "success",
+			  			buttons:false,
+			  			timer:2000
+			  		});
+			  } else {
+				  swal("", {
+			  title: "An error occured!",
+			  icon: "warning",
+			  			  buttons:false,
+			  			  timer:2000
+			  			});
+			      }			      
+			  });
+		  } else {
+		    swal("¡Operation Cancelled");
+		  }
+		});
 }

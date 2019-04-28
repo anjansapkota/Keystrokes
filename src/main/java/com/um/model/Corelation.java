@@ -5,6 +5,7 @@ public class Corelation {
 	double b;
 	double c;
 	double d;
+	double e;
 	public double getA() {
 		return a;
 	}
@@ -28,6 +29,12 @@ public class Corelation {
 	}
 	public void setD(double d) {
 		this.d = d;
+	}
+	public double getE() {
+		return e;
+	}
+	public void setE(double e) {
+		this.e = e;
 	}
 	
 

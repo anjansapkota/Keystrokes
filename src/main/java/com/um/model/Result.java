@@ -5,6 +5,7 @@ public class Result {
 	private Corelation CorrelationTestResult;
 	private int matchesResult;
 	private double score;
+	private String resultptints;
 	
 	public T_Test gettTestResult() {
 		return tTestResult;
@@ -29,5 +30,11 @@ public class Result {
 	}
 	public void setScore(double score) {
 		this.score = score;
+	}
+	public String getResultptints() {
+		return resultptints;
+	}
+	public void setResultptints(String resultptints) {
+		this.resultptints = resultptints;
 	}
 }

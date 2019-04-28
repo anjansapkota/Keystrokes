@@ -5,6 +5,14 @@ public class T_Test {
 	double b;
 	double c;
 	double d;
+	double e;
+	
+	public double getE() {
+		return e;
+	}
+	public void setE(double e) {
+		this.e = e;
+	}
 	public double getA() {
 		return a;
 	}

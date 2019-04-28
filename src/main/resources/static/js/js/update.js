@@ -16,8 +16,8 @@ var count = 0;
 var list = new Array();
 function keydown(e) {
 	var n = window.performance.now();
-	B = n - X;     //press_press    p2-p1
-	C = n - Y;     //P2-R1
+	B = n - X;     //press_press    p1-p2
+	C = n - Y;     //R1-P2
 	X = n;
 	
 	KM=KN;
@@ -36,7 +36,7 @@ function kp(e) {
 
 function keyup(e) {
 	var m = window.performance.now();
-	A = m - X;      //press_release r1-p1
+	A = m - X;      //press_release p1-r1
 	D = m - Y;      // R1-R2
 	Y = m;
 	if(count>0){

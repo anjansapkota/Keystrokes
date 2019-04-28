@@ -43,15 +43,17 @@ public class KMImpl implements KmService {
 	public int savetoDatabase(String matricula, Vector <Key> KeysList)  throws SQLException{
 			int a = 0;
 			int pID = personexists(matricula);
-			String query = "INSERT INTO tecla (letter1, letter2, press1_release1, press1_press2, release1_press2, release1_release2, userid) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO tecla (letter1, letter2, press1_release1, press1_press2, release1_press2, release1_release2, press1_release2, userid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 				for(int i=0; i<KeysList.size(); i++){
 					Key temp = KeysList.get(i);
 					Object[] parametros = new Object[]{
-							temp.getLetter1(), temp.getLetter2(), temp.getPress1_release1(), temp.getPress1_press2(), temp.getRelease1_press2(), temp.getRelease1_release2(), pID};
+							temp.getLetter1(), temp.getLetter2(), temp.getPress1_release1(), temp.getPress1_press2(), temp.getRelease1_press2(), temp.getRelease1_release2(), temp.getPress1_release2(), pID};
 					a = postgresTemplate.update(query, parametros);
 				}
 				return a;
-			}
+	}
+	
+	
 	@Override
 	public Vector <Usuario> bringlistofPersons(){
 		Vector <Usuario> personas =  new Vector<Usuario>();
@@ -94,6 +96,7 @@ public class KMImpl implements KmService {
 			    	temp.setPress1_press2(rs.getLong("press1_press2"));
 			    	temp.setRelease1_press2(rs.getLong("release1_press2"));
 			    	temp.setRelease1_release2(rs.getLong("release1_release2"));
+			    	temp.setPress1_release2(rs.getLong("press1_release2"));
 			    	teclasListadeBD.add(temp);
 			    }							
 		   }
@@ -120,6 +123,17 @@ public class KMImpl implements KmService {
 			}
 		}
 		return count;
+	}
+	
+	
+	@Override
+	public int savetoResultsString(String realuser, String tempuser, String fraud, String score, String result)throws SQLException{
+			int a = 0;
+			int pID = personexists(realuser);
+			String query = "INSERT INTO results (userid, matricula, testinguser,fraud, score, result) VALUES (?, ?, ?, ?, ?, ?)";
+			Object[] parametros = new Object[]{pID, realuser, tempuser, fraud, score, result};
+			a = postgresTemplate.update(query, parametros);
+			return a;
 	}
 
 }

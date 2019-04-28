@@ -40,10 +40,10 @@ public class KeysManagementController {
 	Vector <Key> listofKeysRecieved = new Vector<>();
 	Vector <Key> listofKeysExpectedUser = new Vector<>();
 	List<JSONObject> keys = new ArrayList<>();
-	HashMap<String, Result> ResultTable = new HashMap<String, Result>();
 	private Authentication auth;	
 	private int key = 0; //to avoid error 500 for refresh because it finds a keystroke with null letter1
 	String matriculaEnTexto;
+	Result ResultTable = new Result();
 	//reveiving keys to validate the user
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value= {"/refresh"}, method = RequestMethod.POST)
@@ -53,7 +53,7 @@ public class KeysManagementController {
 		keys = (List<JSONObject>) parser.parse(json);
 		if(keys.size()<=7) {
 			listofKeysRecieved= new Vector<Key>();
-			ResultTable = new HashMap<String, Result>();
+			//ResultTable = new HashMap<String, Result>();
 			auth = SecurityContextHolder.getContext().getAuthentication();
 			matriculaEnTexto = auth.getName();
 		}
@@ -67,13 +67,13 @@ public class KeysManagementController {
 					tempkey.setPress1_release1((long) keys.get(i).get("p1r1")); //25, 000 max
 					tempkey.setRelease1_press2((long) keys.get(i).get("r1p2")); //60, 000 max
 					tempkey.setRelease1_release2((long) keys.get(i).get("r1r2"));  //60, 000 max
+					tempkey.setPress1_release2(tempkey.getPress1_release1() + tempkey.getRelease1_release2());
 					listofKeysRecieved.add(tempkey);
 				}			
 			}
 			key = 1;
 		}
-		int response = 1;
-		Result ResultTable = new Result();
+		int response = 0;
 		if(listofKeysRecieved.size()%100<9) {			//to test every 100 keys		
 		try {
 			listofKeysExpectedUser = kmService.retrieveKeysFromDB(matriculaEnTexto);
@@ -84,18 +84,23 @@ public class KeysManagementController {
 		ResultTable = lbs.checkMatches(ResultTable,listofKeysExpectedUser, listofKeysRecieved, matriculaEnTexto);
 		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
 		System.out.println("The final possiblity of matching this user is "+ ResultTable.getScore() * 100 + "%.");
-		if(listofKeysRecieved.size() > 100) {
+		if(listofKeysRecieved.size() > 400) {
 			if(ResultTable.getScore() < 0.40) {
 				response=2;
-			}			
-			if(ResultTable.getScore() > 0.70) {
+			}
+			else if(ResultTable.getScore() > 0.70) {
 				int a = kmService.savetoDatabase(matriculaEnTexto, listofKeysRecieved);
 				if(a == 1) {
-					System.out.println("Good Matching Saved new keys to DB"); 
+					System.out.println("Good Matching Saved new keys to DB");
+					response=1;
 				}
 			}
+			else {
+				response=1;
+			}
+			}
 		}
-		}
+		
 		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
 	
@@ -107,9 +112,7 @@ public class KeysManagementController {
 			JSONParser parser = new JSONParser();
 			keys = (List<JSONObject>) parser.parse(json);
 			if(keys.size()<=7) {
-				listofKeysRecieved= new Vector<Key>();
-				ResultTable = new HashMap<String, Result>();
-			}
+				listofKeysRecieved= new Vector<Key>();			}
 			for (int i = 0; i < keys.size(); i++) {					//converting json array to model.key array
 				Key tempkey = new Key();
 				if(key > 0) {
@@ -120,18 +123,14 @@ public class KeysManagementController {
 						tempkey.setPress1_release1((long) keys.get(i).get("p1r1")); //25, 000 max
 						tempkey.setRelease1_press2((long) keys.get(i).get("r1p2")); //60, 000 max
 						tempkey.setRelease1_release2((long) keys.get(i).get("r1r2"));  //60, 000 max
+						tempkey.setPress1_release2(tempkey.getPress1_release1() + tempkey.getRelease1_release2());
 						listofKeysRecieved.add(tempkey);
 					}			
 				}
 				key = 1;
 			}
 			
-			int response = 1;
-			//int aaa  = lbs.checkIfCopyPasted(listofKeysRecieved);
-			//if(aaa == 1) {
-				//response=2;
-			//}
-			
+			int response = 1;			
 			return new ResponseEntity<Object>(response, HttpStatus.OK);
 		}
 
@@ -161,15 +160,18 @@ public class KeysManagementController {
 		return modelAndView;
 	}
 	
-	@RequestMapping(value= {"/createGraph"}, method = RequestMethod.GET)
-	public ModelAndView createGraph() throws SQLException {
-		ModelAndView modelAndView = new ModelAndView();
-		String view = "";
+	@RequestMapping(value= {"/saveresult"}, method = RequestMethod.POST)
+	public ResponseEntity<Object> saveresult(String tempuser) throws SQLException {
+		int response =0;
 		auth = SecurityContextHolder.getContext().getAuthentication();
 		String matriculaEnTexto = auth.getName();
-			view = "registrationDetails";
-		listofKeysRecieved = null;
-		modelAndView.setViewName(view);
-		return modelAndView;
+		double score = ResultTable.getScore()*100;
+		if(matriculaEnTexto.equals(tempuser)) {
+			response = kmService.savetoResultsString(matriculaEnTexto, tempuser, "NO", Double.toString(score), ResultTable.getResultptints());				
+		} else {
+			response = kmService.savetoResultsString(matriculaEnTexto, tempuser, "YES", Double.toString(score), ResultTable.getResultptints());	
+		}
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
 	}
+	
 }

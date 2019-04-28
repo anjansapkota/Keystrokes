@@ -64,7 +64,9 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	private static long P1P2 = 800;
 	private static long R1P2 = 800;
 	private static long R1R2 = 800;
+	private static long P1R2 = 1600;
 	private String name = "";
+	public String result = "";
 
 	@Override
 	public Vector<Object> bringAllData(Result ResultTable) throws SQLException {
@@ -96,7 +98,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		for (int i = 0; i < printingList.size(); i++) {
 			Key temp = printingList.get(i);
 			System.out.println(temp.getLetter1() + ", " + temp.getLetter2() + ", " + temp.getPress1_release1() + ", "
-					+ temp.getPress1_press2() + ", " + temp.getRelease1_press2() + ", " + temp.getRelease1_release2());
+					+ temp.getPress1_press2() + ", " + temp.getRelease1_press2() + ", " + temp.getRelease1_release2() + ", " + temp.getPress1_release2());
 		}
 		System.out.println("The vector " + name + " finished printing");
 		System.out.println();
@@ -108,42 +110,49 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		double[] sample1B = new double[teclaList1.size()];
 		double[] sample1C = new double[teclaList1.size()];
 		double[] sample1D = new double[teclaList1.size()];
+		double[] sample1E = new double[teclaList1.size()];
 		for (int i = 0; i < teclaList1.size(); i++) {
 			sample1A[i] = teclaList1.get(i).getPress1_release1();
 			sample1B[i] = teclaList1.get(i).getPress1_press2();
 			sample1C[i] = teclaList1.get(i).getRelease1_press2();
 			sample1D[i] = teclaList1.get(i).getRelease1_release2();
+			sample1E[i] = teclaList1.get(i).getPress1_release2();
 		}
 
 		double[] sample2A = new double[teclaList2.size()];
 		double[] sample2B = new double[teclaList2.size()];
 		double[] sample2C = new double[teclaList2.size()];
 		double[] sample2D = new double[teclaList2.size()];
+		double[] sample2E = new double[teclaList2.size()];
 		for (int i = 0; i < teclaList2.size(); i++) {
 			sample2A[i] = teclaList2.get(i).getPress1_release1();
 			sample2B[i] = teclaList2.get(i).getPress1_press2();
 			sample2C[i] = teclaList2.get(i).getRelease1_press2();
 			sample2D[i] = teclaList2.get(i).getRelease1_release2();
+			sample2E[i] = teclaList2.get(i).getPress1_release2();
 		}
 		T_Test tTestResult = new T_Test();
 		double pValuePress1_release1;
 		double pValuePress1_press2;
 		double pValueRelease1_press2;
 		double pValueRelease1_release2;
+		double pValuePress1_release2;
 		DecimalFormat df = new DecimalFormat("#.00000");
 		TTest ttest = new TTest();
 		pValuePress1_release1 = Double.parseDouble(df.format(ttest.tTest(sample1A, sample2A)));
 		pValuePress1_press2 = Double.parseDouble(df.format(ttest.tTest(sample1B, sample2B)));
 		pValueRelease1_press2 = Double.parseDouble(df.format(ttest.tTest(sample1C, sample2C)));
 		pValueRelease1_release2 = Double.parseDouble(df.format(ttest.tTest(sample1D, sample2D)));
+		pValuePress1_release2 = Double.parseDouble(df.format(ttest.tTest(sample1E, sample2E)));
 		tTestResult.setA(pValuePress1_release1);
 		tTestResult.setB(pValuePress1_press2);
 		tTestResult.setC(pValueRelease1_press2);
 		tTestResult.setD(pValueRelease1_release2);
+		tTestResult.setE(pValuePress1_release2);
 		ResultTable.settTestResult(tTestResult);
-		System.out.println(
+		result = result + "/n" + (
 				"T-Test Results : " + "P1R1: " + pValuePress1_release1 + " and " + "P1P2: " + pValuePress1_press2
-						+ " and " + "R1P2: " + pValueRelease1_press2 + " and " + "R1R2: " + pValueRelease1_release2);
+						+ " and " + "R1P2: " + pValueRelease1_press2 + " and " + "R1R2: " + pValueRelease1_release2 + " and " + "P1R2: " + pValuePress1_release2);
 		return ResultTable;
 
 	}
@@ -261,6 +270,22 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
 						teclasIgualesPersona1.add(persona1Summary.get(j));
 					}
+					if ((personaPruebaSummary.get(i).getPress1_release2() > persona1Summary.get(j)
+							.getPress1_release2())
+							&& (personaPruebaSummary.get(i).getPress1_release2()
+									- persona1Summary.get(j).getPress1_release2() <= P1R2)
+							|| (personaPruebaSummary.get(i).getPress1_release2() < persona1Summary.get(j)
+									.getPress1_release2())
+									&& (persona1Summary.get(j).getPress1_release2()
+											- personaPruebaSummary.get(i).getPress1_release2() <= P1R2)) {
+						matchcount++;
+						// System.out.println("Found match where i .. " + i +" j .. " + j + " " + "
+						// KEYID " + persona1Summary.get(j).getId() + " " + l1 + " " + l2 + "
+						// Press1_release2 " + (personaPruebaSummary.get(i).getPress1_release2() -
+						// persona1Summary.get(j).getPress1_release2()));
+						teclasIgualespersonaPrueba.add(personaPruebaSummary.get(i));
+						teclasIgualesPersona1.add(persona1Summary.get(j));
+					}
 				}
 			}
 		}
@@ -281,15 +306,18 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
 			ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
 			nr = Mean(normality_results);
-			System.out.println("The possiblity of matching this user through pdf is  " + nr);
-			System.out.println("Matchcount = " + matchcount + " Total Sample = " + N_sample * 4);
+			result = result + "/n" +  "The possiblity of matching this user through pdf is  " + nr;
+			result = result + "/n" +  "Matchcount = " + matchcount + " Total Sample = " + N_sample * 4;
 			score = poss_by_class + nr + ResultTable.getCorrelationTestResult().getA()
 					+ ResultTable.getCorrelationTestResult().getB() + +ResultTable.getCorrelationTestResult().getC()
-					+ ResultTable.getCorrelationTestResult().getD();
+					+ ResultTable.getCorrelationTestResult().getD() + ResultTable.getCorrelationTestResult().getE();
 
 		}
 		score = score / 6;
-		ResultTable.setScore(score);
+		ResultTable.setScore(score);		
+		result = result + "/n" + "The final score is " + score*100;
+		ResultTable.setResultptints(result);
+		System.out.println(result);
 		return ResultTable;
 	}
 
@@ -303,30 +331,35 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		double[] sample1B = new double[teclaList1.size()];
 		double[] sample1C = new double[teclaList1.size()];
 		double[] sample1D = new double[teclaList1.size()];
+		double[] sample1E = new double[teclaList1.size()];
 		for (int i = 0; i < teclaList1.size(); i++) {
 			sample1A[i] = teclaList1.get(i).getPress1_release1();
 			sample1B[i] = teclaList1.get(i).getPress1_press2();
 			sample1C[i] = teclaList1.get(i).getRelease1_press2();
 			sample1D[i] = teclaList1.get(i).getRelease1_release2();
+			sample1E[i] = teclaList1.get(i).getPress1_release2();
 		}
 
 		double[] sample2A = new double[teclaList2.size()];
 		double[] sample2B = new double[teclaList2.size()];
 		double[] sample2C = new double[teclaList2.size()];
 		double[] sample2D = new double[teclaList2.size()];
+		double[] sample2E = new double[teclaList2.size()];
 		for (int i = 0; i < teclaList2.size(); i++) {
 			sample2A[i] = teclaList2.get(i).getPress1_release1();
 			sample2B[i] = teclaList2.get(i).getPress1_press2();
 			sample2C[i] = teclaList2.get(i).getRelease1_press2();
 			sample2D[i] = teclaList2.get(i).getRelease1_release2();
+			sample2E[i] = teclaList2.get(i).getPress1_release2();
 		}
 
 		x = processProbability(sample1A, sample2A);
 		x = x + processProbability(sample1B, sample2B);
 		x = x + processProbability(sample1C, sample2C);
 		x = x + processProbability(sample1D, sample2D);
+		x = x + processProbability(sample1E, sample2E);
 
-		x = x / 4;
+		x = x / 5;
 
 		return x;
 	}
@@ -403,41 +436,47 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		double[] sample1B = new double[teclaList1.size()];
 		double[] sample1C = new double[teclaList1.size()];
 		double[] sample1D = new double[teclaList1.size()];
+		double[] sample1E = new double[teclaList1.size()];
 		for (int i = 0; i < teclaList1.size(); i++) {
 			sample1A[i] = teclaList1.get(i).getPress1_release1();
 			sample1B[i] = teclaList1.get(i).getPress1_press2();
 			sample1C[i] = teclaList1.get(i).getRelease1_press2();
 			sample1D[i] = teclaList1.get(i).getRelease1_release2();
+			sample1E[i] = teclaList1.get(i).getPress1_release2();
 		}
 
 		double[] sample2A = new double[teclaList2.size()];
 		double[] sample2B = new double[teclaList2.size()];
 		double[] sample2C = new double[teclaList2.size()];
 		double[] sample2D = new double[teclaList2.size()];
+		double[] sample2E = new double[teclaList2.size()];
 		for (int i = 0; i < teclaList2.size(); i++) {
 			sample2A[i] = teclaList2.get(i).getPress1_release1();
 			sample2B[i] = teclaList2.get(i).getPress1_press2();
 			sample2C[i] = teclaList2.get(i).getRelease1_press2();
 			sample2D[i] = teclaList2.get(i).getRelease1_release2();
+			sample2E[i] = teclaList2.get(i).getPress1_release2();
 		}
-
 		Corelation correlationTestResult = new Corelation();
 		double a;
 		double b;
 		double c;
 		double d;
+		double e;
 		if (teclaList1.size() > 2) {
 			a = new PearsonsCorrelation().correlation(sample1A, sample2A);
 			b = new PearsonsCorrelation().correlation(sample1B, sample2B);
 			c = new PearsonsCorrelation().correlation(sample1C, sample2C);
 			d = new PearsonsCorrelation().correlation(sample1D, sample2D);
+			e = new PearsonsCorrelation().correlation(sample1E, sample2E);
 			correlationTestResult.setA(a);
 			correlationTestResult.setB(b);
 			correlationTestResult.setC(c);
 			correlationTestResult.setD(d);
-			System.out.println("Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a)
-					+ " P1P2 " + Double.toString(b) + " is  R1P2:  " + Double.toString(c) + " is  R1R2:  "
-					+ Double.toString(d));
+			correlationTestResult.setE(e);
+			result = result + "/n" + "Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a)
+					+ " P1P2 " + Double.toString(b) + ",  R1P2:  " + Double.toString(c) + ", R1R2:  "
+					+ Double.toString(d) + ", P1R2:  " + Double.toString(e);
 			ResultTable.setCorrelationTestResult(correlationTestResult);
 		}
 		return ResultTable;
@@ -502,6 +541,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		atts.add(new Attribute("P1P2"));
 		atts.add(new Attribute("R1P2"));
 		atts.add(new Attribute("R1R2"));
+		atts.add(new Attribute("P1R2"));
 		atts.add(new Attribute(name));
 
 //        Remove removeFilter = new Remove();
@@ -612,6 +652,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			fw.println("@ATTRIBUTE P1P2  NUMERIC");
 			fw.println("@ATTRIBUTE R1P2  NUMERIC");
 			fw.println("@ATTRIBUTE R1R2  NUMERIC");
+			fw.println("@ATTRIBUTE P1R2  NUMERIC");
 			fw.println();
 			fw.println("@ATTRIBUTE class {'" + name + "', 'outlier'}");
 
@@ -621,7 +662,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			for (int i = 0; i < vD.size(); i++) {
 				Key a = vD.get(i);
 				fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + ","
-						+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2()
+						+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + a.getPress1_release2()
 						+ ", ?");
 			}
 			fw.close();
@@ -651,6 +692,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			fw.println("@ATTRIBUTE P1P2  NUMERIC");
 			fw.println("@ATTRIBUTE R1P2  NUMERIC");
 			fw.println("@ATTRIBUTE R1R2  NUMERIC");
+			fw.println("@ATTRIBUTE P1R2  NUMERIC");
 			fw.println();
 			fw.println("@ATTRIBUTE class {'" + name + "', 'outlier'}");
 			fw.println();
@@ -660,25 +702,30 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			List<Long> sampleB = new ArrayList<Long>();
 			List<Long> sampleC = new ArrayList<Long>();
 			List<Long> sampleD = new ArrayList<Long>();
+			List<Long> sampleE = new ArrayList<Long>();
 			for (int i = 0; i < input.size(); i++) {
 				sampleA.add(input.get(i).getPress1_release1());
 				sampleB.add(input.get(i).getPress1_press2());
 				sampleC.add(input.get(i).getRelease1_press2());
 				sampleD.add(input.get(i).getRelease1_release2());
+				sampleE.add(input.get(i).getPress1_release2());
 			}
 
 			List<Long> sample1A = new ArrayList<Long>();
 			List<Long> sample1B = new ArrayList<Long>();
 			List<Long> sample1C = new ArrayList<Long>();
 			List<Long> sample1D = new ArrayList<Long>();
+			List<Long> sample1E = new ArrayList<Long>();
 			List<Long> sample2A = new ArrayList<Long>();
 			List<Long> sample2B = new ArrayList<Long>();
 			List<Long> sample2C = new ArrayList<Long>();
 			List<Long> sample2D = new ArrayList<Long>();
+			List<Long> sample2E = new ArrayList<Long>();
 			Collections.sort(sampleA);
 			Collections.sort(sampleB);
 			Collections.sort(sampleC);
 			Collections.sort(sampleD);
+			Collections.sort(sampleE);
 			if (input.size() % 2 == 0) {
 				sample1A = sampleA.subList(0, sampleA.size() / 2);
 				sample2A = sampleA.subList(sampleA.size() / 2, sampleA.size());
@@ -688,6 +735,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				sample2C = sampleC.subList(sampleC.size() / 2, sampleC.size());
 				sample1D = sampleD.subList(0, sampleD.size() / 2);
 				sample2D = sampleD.subList(sampleD.size() / 2, sampleD.size());
+				sample1E = sampleE.subList(0, sampleE.size() / 2);
+				sample2E = sampleE.subList(sampleE.size() / 2, sampleE.size());
 			} else {
 				sample1A = sampleA.subList(0, sampleA.size() / 2);
 				sample2A = sampleA.subList(sampleA.size() / 2 + 1, sampleA.size());
@@ -697,6 +746,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				sample2C = sampleC.subList(sampleC.size() / 2 + 1, sampleC.size());
 				sample1D = sampleD.subList(0, sampleD.size() / 2);
 				sample2D = sampleD.subList(sampleD.size() / 2 + 1, sampleD.size());
+				sample1E = sampleE.subList(0, sampleE.size() / 2);
+				sample2E = sampleE.subList(sampleE.size() / 2 + 1, sampleE.size());
 			}
 			double Aq1 = getMedian(sample1A);
 			double Aq3 = getMedian(sample2A);
@@ -706,10 +757,13 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			double Cq3 = getMedian(sample2C);
 			double Dq1 = getMedian(sample1D);
 			double Dq3 = getMedian(sample2D);
+			double Eq1 = getMedian(sample1E);
+			double Eq3 = getMedian(sample2E);
 			double Aiqr = Aq3 - Aq1;
 			double Biqr = Bq3 - Bq1;
 			double Ciqr = Cq3 - Cq1;
 			double Diqr = Dq3 - Dq1;
+			double Eiqr = Eq3 - Eq1;
 			double AlowerFence = Aq1 - 1.5 * Aiqr;
 			double AupperFence = Aq3 + 1.5 * Aiqr;
 			double BlowerFence = Bq1 - 1.5 * Biqr;
@@ -718,6 +772,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			double CupperFence = Cq3 + 1.5 * Ciqr;
 			double DlowerFence = Dq1 - 1.5 * Diqr;
 			double DupperFence = Dq3 + 1.5 * Diqr;
+			double ElowerFence = Eq1 - 1.5 * Eiqr;
+			double EupperFence = Eq3 + 1.5 * Eiqr;
 			for (int i = 0; i < input.size(); i++) {
 				Boolean detected = false;
 				Key a = input.get(i);
@@ -725,6 +781,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				Long B = a.getPress1_press2();
 				Long C = a.getRelease1_press2();
 				Long D = a.getRelease1_release2();
+				Long E = a.getPress1_release2();
 				if (A < AlowerFence+1000 || A > AupperFence-1000) detected = true;
 			
 				//else if (B < BlowerFence || B > BupperFence) detected = true;
@@ -732,14 +789,16 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				else if (C < ClowerFence+2000 || C > CupperFence-2000) detected = true;
 				
 				//else if (D < DlowerFence || D > DupperFence) detected = true;
+				
+				//else if (E < ElowerFence || E > EupperFence) detected = true;
 
 				if (detected)
 					fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + ","
-							+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2()
+							+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + a.getPress1_release2()
 							+ "," + "outlier");
 				else
 					fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + ","
-							+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2()
+							+ a.getPress1_release1() + "," + a.getRelease1_press2() + "," + a.getRelease1_release2() + "," + a.getPress1_release2()
 							+ "," + name);
 			}
 
@@ -772,31 +831,36 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	}
 
 	public static List<Long> getOutliers(Vector<Key> input) {
+		List<Long> output = new ArrayList<Long>();
+
 		List<Long> sampleA = new ArrayList<Long>();
 		List<Long> sampleB = new ArrayList<Long>();
 		List<Long> sampleC = new ArrayList<Long>();
 		List<Long> sampleD = new ArrayList<Long>();
+		List<Long> sampleE = new ArrayList<Long>();
 		for (int i = 0; i < input.size(); i++) {
 			sampleA.add(input.get(i).getPress1_release1());
 			sampleB.add(input.get(i).getPress1_press2());
 			sampleC.add(input.get(i).getRelease1_press2());
 			sampleD.add(input.get(i).getRelease1_release2());
+			sampleE.add(input.get(i).getPress1_release2());
 		}
-
-		List<Long> output = new ArrayList<Long>();
 
 		List<Long> sample1A = new ArrayList<Long>();
 		List<Long> sample1B = new ArrayList<Long>();
 		List<Long> sample1C = new ArrayList<Long>();
 		List<Long> sample1D = new ArrayList<Long>();
+		List<Long> sample1E = new ArrayList<Long>();
 		List<Long> sample2A = new ArrayList<Long>();
 		List<Long> sample2B = new ArrayList<Long>();
 		List<Long> sample2C = new ArrayList<Long>();
 		List<Long> sample2D = new ArrayList<Long>();
+		List<Long> sample2E = new ArrayList<Long>();
 		Collections.sort(sampleA);
 		Collections.sort(sampleB);
 		Collections.sort(sampleC);
 		Collections.sort(sampleD);
+		Collections.sort(sampleE);
 		if (input.size() % 2 == 0) {
 			sample1A = sampleA.subList(0, sampleA.size() / 2);
 			sample2A = sampleA.subList(sampleA.size() / 2, sampleA.size());
@@ -806,6 +870,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			sample2C = sampleC.subList(sampleC.size() / 2, sampleC.size());
 			sample1D = sampleD.subList(0, sampleD.size() / 2);
 			sample2D = sampleD.subList(sampleD.size() / 2, sampleD.size());
+			sample1E = sampleE.subList(0, sampleE.size() / 2);
+			sample2E = sampleE.subList(sampleE.size() / 2, sampleE.size());
 		} else {
 			sample1A = sampleA.subList(0, sampleA.size() / 2);
 			sample2A = sampleA.subList(sampleA.size() / 2 + 1, sampleA.size());
@@ -815,6 +881,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			sample2C = sampleC.subList(sampleC.size() / 2 + 1, sampleC.size());
 			sample1D = sampleD.subList(0, sampleD.size() / 2);
 			sample2D = sampleD.subList(sampleD.size() / 2 + 1, sampleD.size());
+			sample1E = sampleE.subList(0, sampleE.size() / 2);
+			sample2E = sampleE.subList(sampleE.size() / 2 + 1, sampleE.size());
 		}
 		double Aq1 = getMedian(sample1A);
 		double Aq3 = getMedian(sample2A);
@@ -824,37 +892,48 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		double Cq3 = getMedian(sample2C);
 		double Dq1 = getMedian(sample1D);
 		double Dq3 = getMedian(sample2D);
+		double Eq1 = getMedian(sample1E);
+		double Eq3 = getMedian(sample2E);
 		double Aiqr = Aq3 - Aq1;
 		double Biqr = Bq3 - Bq1;
 		double Ciqr = Cq3 - Cq1;
 		double Diqr = Dq3 - Dq1;
-		double AlowerFence = Aq1 - 1.5 * Aiqr+500;
-		double AupperFence = Aq3 + 1.5 * Aiqr-500;
-		double BlowerFence = Bq1 - 1.5 * Biqr+500;
-		double BupperFence = Bq3 + 1.5 * Biqr-500;
-		double ClowerFence = Cq1 - 1.5 * Ciqr+500;
-		double CupperFence = Cq3 + 1.5 * Ciqr-500;
-		double DlowerFence = Dq1 - 1.5 * Diqr+500;
-		double DupperFence = Dq3 + 1.5 * Diqr-500;
+		double Eiqr = Eq3 - Eq1;
+		double AlowerFence = Aq1 - 1.5 * Aiqr;
+		double AupperFence = Aq3 + 1.5 * Aiqr;
+		double BlowerFence = Bq1 - 1.5 * Biqr;
+		double BupperFence = Bq3 + 1.5 * Biqr;
+		double ClowerFence = Cq1 - 1.5 * Ciqr;
+		double CupperFence = Cq3 + 1.5 * Ciqr;
+		double DlowerFence = Dq1 - 1.5 * Diqr;
+		double DupperFence = Dq3 + 1.5 * Diqr;
+		double ElowerFence = Eq1 - 1.5 * Eiqr;
+		double EupperFence = Eq3 + 1.5 * Eiqr;
 		for (int i = 0; i < input.size(); i++) {
-			Long A = input.get(i).getPress1_release1();
-			Long B = input.get(i).getPress1_press2();
-			Long C = input.get(i).getRelease1_press2();
-			Long D = input.get(i).getRelease1_release2();
+			Boolean detected = false;
+			Key a = input.get(i);
+			Long A = a.getPress1_release1();
+			Long B = a.getPress1_press2();
+			Long C = a.getRelease1_press2();
+			Long D = a.getRelease1_release2();
+			Long E = a.getPress1_release2();
 			if (A < AlowerFence || A > AupperFence)
 				output.add(input.get(i).getPress1_release1());
 
 			
 			if (B < BlowerFence || B > BupperFence)
-			output.add(input.get(i).getPress1_release1());
+			output.add(input.get(i).getPress1_press2());
 			
 
 			if (C < ClowerFence || C > CupperFence)
-				output.add(input.get(i).getPress1_release1());
+				output.add(input.get(i).getRelease1_press2());
 
 			
 			if (D < DlowerFence || D > DupperFence)
-			output.add(input.get(i).getPress1_release1());
+			output.add(input.get(i).getRelease1_release2());
+			
+			if (E < ElowerFence || E > EupperFence)
+				output.add(input.get(i).getPress1_release2());
 			
 			
 		}
