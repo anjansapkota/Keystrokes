@@ -9,7 +9,7 @@ public class Usuario {
 	private String nombre;
 	@Size(min = 7, max = 7, message="Matricula invalido")
 	private String matricula;
-	@Size(min=4, max=50, message="Debe tener mas de 4 caracteres")
+	@Size(min=2, max=50, message="Debe tener mas de 4 caracteres")
 	private String password;
 	private int activo;
 	private int reg_estado;

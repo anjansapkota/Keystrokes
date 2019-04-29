@@ -84,7 +84,7 @@ public class KeysManagementController {
 		ResultTable = lbs.checkMatches(ResultTable,listofKeysExpectedUser, listofKeysRecieved, matriculaEnTexto);
 		System.out.println("The user was matched " + ResultTable.getMatchesResult() + "Times.");
 		System.out.println("The final possiblity of matching this user is "+ ResultTable.getScore() * 100 + "%.");
-		if(listofKeysRecieved.size() > 400) {
+		if(listofKeysRecieved.size() > 200) {
 			if(ResultTable.getScore() < 0.40) {
 				response=2;
 			}

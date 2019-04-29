@@ -149,8 +149,8 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		tTestResult.setC(pValueRelease1_press2);
 		tTestResult.setD(pValueRelease1_release2);
 		tTestResult.setE(pValuePress1_release2);
-		ResultTable.settTestResult(tTestResult);
-		result = result + "/n" + (
+		ResultTable.settTestResult(tTestResult);		
+		result = result + "   " + (
 				"T-Test Results : " + "P1R1: " + pValuePress1_release1 + " and " + "P1P2: " + pValuePress1_press2
 						+ " and " + "R1P2: " + pValueRelease1_press2 + " and " + "R1R2: " + pValueRelease1_release2 + " and " + "P1R2: " + pValuePress1_release2);
 		return ResultTable;
@@ -160,6 +160,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 	@Override
 	public Result checkMatches(Result ResultTable, Vector<Key> persona1Summary, Vector<Key> personaPruebaSummary,
 			String Name) throws Exception {
+		result ="Results: ";
 		name = Name;
 		double poss_by_class = classify(persona1Summary, personaPruebaSummary);
 		// HashMap<String, Object> IPD = new HashMap<String, Object> (); //individual or
@@ -306,16 +307,37 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			ResultTable = correlationtest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
 			ResultTable = tTest(ResultTable, teclasIgualespersonaPrueba, teclasIgualesPersona1, Name);
 			nr = Mean(normality_results);
-			result = result + "/n" +  "The possiblity of matching this user through pdf is  " + nr;
-			result = result + "/n" +  "Matchcount = " + matchcount + " Total Sample = " + N_sample * 4;
+			result = result + "   " +  "The possiblity of matching this user through pdf is  " + nr;
+			result = result + "   " +  "Matchcount = " + matchcount + " Total Sample = " + N_sample * 4;
 			score = poss_by_class + nr + ResultTable.getCorrelationTestResult().getA()
 					+ ResultTable.getCorrelationTestResult().getB() + +ResultTable.getCorrelationTestResult().getC()
 					+ ResultTable.getCorrelationTestResult().getD() + ResultTable.getCorrelationTestResult().getE();
 
 		}
-		score = score / 6;
+		T_Test tt = ResultTable.gettTestResult();
+		int reject= 0;
+		if(tt.getA()<0.15) {
+			reject ++;
+		}
+		if(tt.getB()<0.15) {
+			reject ++;
+		}
+		if(tt.getC()<0.15) {
+			reject ++;
+		}
+		if(tt.getD()<0.15) {
+			reject ++;
+		}
+		if(tt.getE()<0.15) {
+			reject ++;
+		}
+		double ttestaverage = (tt.getA() + tt.getB()+ tt.getC()+tt.getD()+tt.getE())/5;
+		if(reject >= 3) {
+			score = score / 7;
+		} else score = score / 6;
+		
 		ResultTable.setScore(score);		
-		result = result + "/n" + "The final score is " + score*100;
+		result = result + "   " + "The final score is " + score*100;
 		ResultTable.setResultptints(result);
 		System.out.println(result);
 		return ResultTable;
@@ -474,7 +496,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			correlationTestResult.setC(c);
 			correlationTestResult.setD(d);
 			correlationTestResult.setE(e);
-			result = result + "/n" + "Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a)
+			result = result + "   " + "Correlation Coeffecient Results with " + Name + " is  P1R1:  " + Double.toString(a)
 					+ " P1P2 " + Double.toString(b) + ",  R1P2:  " + Double.toString(c) + ", R1R2:  "
 					+ Double.toString(d) + ", P1R2:  " + Double.toString(e);
 			ResultTable.setCorrelationTestResult(correlationTestResult);
@@ -587,7 +609,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 		// eval.evaluateModel(classifier, learning);
 		// print the results of modeling
 		String strSummary = eval.toSummaryString();
-		System.out.println("" + strSummary);
+		result = result  + strSummary;
 		one_class_classifier.buildClassifier(training);
 		saveModelToFile(name, one_class_classifier);
 
@@ -633,7 +655,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				no++;
 		}
 		double Possibility = ((double) yes) / ((double) classes.size());
-		System.out.println(
+		result = result + " " +(
 				"Possiblity by classification is " + yes + "/" + classes.size() + "   = " + Possibility * 100 + "% ");
 
 		return Possibility;
@@ -782,15 +804,20 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 				Long C = a.getRelease1_press2();
 				Long D = a.getRelease1_release2();
 				Long E = a.getPress1_release2();
-				if (A < AlowerFence+1000 || A > AupperFence-1000) detected = true;
+				double aaa=1000; //1000
+				double bbb = 1000;
+				double ccc=1000; ////2000
+				double ddd = 1000;
+				double eee = 2000;
+				if (A < AlowerFence+aaa || A > AupperFence-aaa) detected = true;
 			
-				//else if (B < BlowerFence || B > BupperFence) detected = true;
+				else if (B < BlowerFence + bbb || B > BupperFence - bbb) detected = true;
 
-				else if (C < ClowerFence+2000 || C > CupperFence-2000) detected = true;
+				else if (C < ClowerFence + ccc || C > CupperFence - ccc) detected = true; 
 				
-				//else if (D < DlowerFence || D > DupperFence) detected = true;
+				else if (D < DlowerFence + ddd || D > DupperFence - ddd) detected = true;
 				
-				//else if (E < ElowerFence || E > EupperFence) detected = true;
+				else if (E < ElowerFence + eee || E > EupperFence - eee) detected = true;
 
 				if (detected)
 					fw.println(a.getLetter1() + "," + a.getLetter2() + "," + a.getPress1_press2() + ","

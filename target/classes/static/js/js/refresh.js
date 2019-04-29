@@ -93,7 +93,7 @@ function ajaxFire(list) {
 							});
 							setTimeout(function () {
 								SaveAction();    
-					    		}, 3000);
+					    		}, 2200);
 						}
 						
 					},
@@ -117,7 +117,7 @@ function SaveAction(){
 		  text: 'Please provide your matricula.',
 		  content: "input",
 		  button: {
-		    text: "Search!",
+		    text: "Submit!",
 		    closeModal: false,
 		  },
 		})
