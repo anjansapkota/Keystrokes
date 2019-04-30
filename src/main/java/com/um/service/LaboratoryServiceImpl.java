@@ -332,7 +332,7 @@ public class LaboratoryServiceImpl implements LaboratoryService {
 			reject ++;
 		}
 		double ttestaverage = (tt.getA() + tt.getB()+ tt.getC()+tt.getD()+tt.getE())/5;
-		if(reject >= 3) {
+		if(reject >= 2) {
 			score = score / 7;
 		} else score = score / 6;
 		
