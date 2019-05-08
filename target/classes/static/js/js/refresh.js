@@ -18,8 +18,7 @@ function keydown(e) {
 	var n = window.performance.now();
 	B = n - X;     //press_press    p1-p2
 	C = n - Y;     //R1-P2
-	X = n;
-	
+	X = n;	
 	KM=KN;
 	if(e.ctrlKey && e.keyCode==86){
 		KN = 999999999;
@@ -40,15 +39,8 @@ function keyup(e) {
 	D = m - Y;      // R1-R2
 	Y = m;
 	if(count>0){
-		myObj = { "l1":KM, "l2":KN, "p1r1":Math.round(A*100), "p1p2":Math.round(B*100), "r1p2":Math.round(C*100), "r1r2":Math.round(D*100)};
-//		
-//		var nameOfList = new Array();
-//		nameOfList.push(KM);
-//		nameOfList.push(KN);
-//		nameOfList.push(A);
-//		nameOfList.push(B);
-//		nameOfList.push(C);
-//		nameOfList.push(D);
+		myObj = { "l1":KM, "l2":KN, "p1r1":Math.round(A*100), "p1p2":Math.round(B*100), 
+				"r1p2":Math.round(C*100), "r1r2":Math.round(D*100)};
 		list.push(myObj)
 	}
 	count++;

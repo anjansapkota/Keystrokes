@@ -107,6 +107,7 @@
 		    <artifactId>oneClassClassifier</artifactId>
 		    <version>1.0.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.mail/mail -->
 				
 	</dependencies>
 
